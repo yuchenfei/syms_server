@@ -127,3 +127,5 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'api.views.custom_exception_handler'
 }
+
+AUTH_USER_MODEL = 'info.User'

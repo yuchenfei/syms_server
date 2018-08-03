@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model, login, logout
-from django.contrib.auth.models import User, AnonymousUser
 from django.http import JsonResponse
-from rest_framework import viewsets, permissions, exceptions
+from rest_framework import viewsets, permissions, exceptions, pagination, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
+from info.models import User
 from info.serializers import UserSerializer
 
 
@@ -45,7 +48,7 @@ class LoginView(APIView):
         login(request, user)
         return JsonResponse({
             'status': 'ok',
-            'currentAuthority': 'admin' if user.profile.is_admin else 'user'
+            'currentAuthority': 'admin' if user.is_admin else 'user'
         })
 
 
@@ -68,7 +71,28 @@ class CurrentUserView(APIView):
             })
 
 
+# 暂时解决csrf问题
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    parser_classes = (FormParser, JSONParser, MultiPartParser)
+    authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        # 保存时生成用户名
+        response = super().create(request, *args, **kwargs)
+        if status.HTTP_201_CREATED == response.status_code:
+            user = User.objects.get(username=request.data['username'])
+            user.set_password('123456')
+            user.save()
+        return response
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        return super().update(request, *args, **kwargs)
