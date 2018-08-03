@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model, login, logout
+from django.db.models import Q
 from django.http import JsonResponse
 from rest_framework import viewsets, permissions, exceptions, pagination, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from info.models import User
@@ -83,6 +83,17 @@ class UserViewSet(viewsets.ModelViewSet):
     parser_classes = (FormParser, JSONParser, MultiPartParser)
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        username = self.request.query_params.get('username', None)
+        is_admin = self.request.query_params.get('is_admin', None)
+        if is_admin:  # str to bool
+            is_admin = True if 'true' == is_admin else False
+        if username or is_admin is not None:
+            return queryset.filter(Q(username__icontains=username) | Q(is_admin=is_admin))
+        else:
+            return queryset
 
     def create(self, request, *args, **kwargs):
         # 保存时生成用户名
