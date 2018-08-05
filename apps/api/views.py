@@ -7,8 +7,8 @@ from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView, exception_handler
 
-from info.models import User
-from info.serializers import UserSerializer
+from info.models import User, Classes
+from info.serializers import UserSerializer, ClassesSerializer
 
 
 def custom_exception_handler(exc, context):
@@ -107,3 +107,10 @@ class UserViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         print(request.data)
         return super().update(request, *args, **kwargs)
+
+
+class ClassesViewSet(viewsets.ModelViewSet):
+    queryset = Classes.objects.all()
+    serializer_class = ClassesSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
