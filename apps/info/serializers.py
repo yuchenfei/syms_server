@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from info.models import User, Classes
+from info.models import User, Classes, Course
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,4 +18,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ClassesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classes
+        fields = '__all__'
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
         fields = '__all__'

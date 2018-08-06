@@ -7,4 +7,11 @@ class User(AbstractUser):
 
 
 class Classes(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
+
+
+class Course(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    term = models.CharField(max_length=50)
+    status = models.BooleanField(default=False)

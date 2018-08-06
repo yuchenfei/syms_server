@@ -6,6 +6,7 @@ from api import views
 router = DefaultRouter()
 router.register('users', views.UserViewSet)
 router.register('classes', views.ClassesViewSet)
+router.register('course', views.CourseViewSet)
 
 urlpatterns = [
     path('login', views.LoginView.as_view()),

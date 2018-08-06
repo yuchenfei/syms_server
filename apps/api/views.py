@@ -7,8 +7,8 @@ from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView, exception_handler
 
-from info.models import User, Classes
-from info.serializers import UserSerializer, ClassesSerializer
+from info.models import User, Classes, Course
+from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer
 
 
 def custom_exception_handler(exc, context):
@@ -86,14 +86,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = User.objects.all()
-        username = self.request.query_params.get('username', None)
+        username = self.request.query_params.get('username', '')
         is_admin = self.request.query_params.get('is_admin', None)
-        if is_admin:  # str to bool
+        if is_admin is not None:  # str to bool
             is_admin = True if 'true' == is_admin else False
-        if username or is_admin is not None:
-            return queryset.filter(Q(username__icontains=username) | Q(is_admin=is_admin))
-        else:
-            return queryset
+            queryset = queryset.filter(is_admin=is_admin)
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         # 保存时生成用户名
@@ -114,3 +114,21 @@ class ClassesViewSet(viewsets.ModelViewSet):
     serializer_class = ClassesSerializer
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Course.objects.all()
+        name = self.request.query_params.get('name', '')
+        _status = self.request.query_params.get('status', None)
+        if _status is not None:
+            _status = True if 'true' == _status else False
+            queryset = queryset.filter(status=_status)
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
