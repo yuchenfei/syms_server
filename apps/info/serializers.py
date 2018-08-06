@@ -1,7 +1,6 @@
-from django.conf import settings
 from rest_framework import serializers
 
-from info.models import User, Classes, Course
+from .models import User, Classes, Course
 
 
 class UserSerializer(serializers.ModelSerializer):

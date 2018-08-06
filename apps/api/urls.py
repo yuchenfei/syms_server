@@ -7,6 +7,7 @@ router = DefaultRouter()
 router.register('users', views.UserViewSet)
 router.register('classes', views.ClassesViewSet)
 router.register('course', views.CourseViewSet)
+router.register('experiment', views.ExperimentViewSet)
 
 urlpatterns = [
     path('login', views.LoginView.as_view()),

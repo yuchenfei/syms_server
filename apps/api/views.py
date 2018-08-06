@@ -7,6 +7,8 @@ from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView, exception_handler
 
+from experiment.models import Experiment
+from experiment.serializers import ExperimentSerializer
 from info.models import User, Classes, Course
 from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer
 
@@ -129,6 +131,23 @@ class CourseViewSet(viewsets.ModelViewSet):
         if _status is not None:
             _status = True if 'true' == _status else False
             queryset = queryset.filter(status=_status)
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
+
+
+class ExperimentViewSet(viewsets.ModelViewSet):
+    queryset = Experiment.objects.all()
+    serializer_class = ExperimentSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Experiment.objects.all()
+        name = self.request.query_params.get('name', '')
+        course = self.request.query_params.get('course', '')
+        if course:
+            queryset = queryset.filter(course=course)
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
