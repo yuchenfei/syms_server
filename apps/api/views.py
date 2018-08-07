@@ -7,6 +7,8 @@ from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView, exception_handler
 
+from exam.models import ExamSetting
+from exam.serializers import ExamSettingSerializer
 from experiment.models import Experiment
 from experiment.serializers import ExperimentSerializer
 from info.models import User, Classes, Course, Student
@@ -128,6 +130,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         queryset = Course.objects.all()
         name = self.request.query_params.get('name', '')
         _status = self.request.query_params.get('status', None)
+        classes = self.request.query_params.get('classes', '')
+        if classes:
+            queryset = queryset.filter(classes=classes)
         if _status is not None:
             _status = True if 'true' == _status else False
             queryset = queryset.filter(status=_status)
@@ -168,3 +173,19 @@ class StudentViewSet(viewsets.ModelViewSet):
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+
+class ExamSettingViewSet(viewsets.ModelViewSet):
+    queryset = ExamSetting.objects.all()
+    serializer_class = ExamSettingSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = ExamSetting.objects.filter(teacher=user).all()
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        request.data['teacher'] = request.user.id
+        return super().create(request, *args, **kwargs)

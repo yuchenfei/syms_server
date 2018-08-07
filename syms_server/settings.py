@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'info.apps.InfoConfig',
     'experiment.apps.ExperimentConfig',
+    'exam.apps.ExamConfig',
     'api.apps.ApiConfig',
 ]
 
