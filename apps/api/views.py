@@ -9,8 +9,8 @@ from rest_framework.views import APIView, exception_handler
 
 from experiment.models import Experiment
 from experiment.serializers import ExperimentSerializer
-from info.models import User, Classes, Course
-from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer
+from info.models import User, Classes, Course, Student
+from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer, StudentSerializer
 
 
 def custom_exception_handler(exc, context):
@@ -148,6 +148,23 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         course = self.request.query_params.get('course', '')
         if course:
             queryset = queryset.filter(course=course)
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
+
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Student.objects.all()
+        name = self.request.query_params.get('name', '')
+        classes = self.request.query_params.get('classes', '')
+        if classes:
+            queryset = queryset.filter(classes=classes)
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset

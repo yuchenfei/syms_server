@@ -15,3 +15,9 @@ class Course(models.Model):
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
     term = models.CharField(max_length=50)
     status = models.BooleanField(default=False)
+
+
+class Student(models.Model):
+    xh = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=5)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
