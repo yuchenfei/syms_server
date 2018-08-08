@@ -8,7 +8,7 @@ class Item(models.Model):
 
 
 class Experiment(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.ForeignKey(Item,on_delete=models.CASCADE)
     describe = models.CharField(max_length=255, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     remark = models.CharField(max_length=255, blank=True)

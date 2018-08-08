@@ -163,7 +163,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
         if course:
             queryset = queryset.filter(course=course)
         if name:
-            queryset = queryset.filter(name__icontains=name)
+            queryset = queryset.filter(name=name)
         return queryset
 
 

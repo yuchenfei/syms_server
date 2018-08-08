@@ -13,3 +13,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experiment
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['info'] = '{}({})'.format(instance.course.name, instance.course.classes.name)
+        return representation
