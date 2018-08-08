@@ -8,10 +8,10 @@ class Item(models.Model):
 
 
 class Experiment(models.Model):
-    name = models.ForeignKey(Item,on_delete=models.CASCADE)
+    item = models.ForeignKey(Item,on_delete=models.CASCADE)
     describe = models.CharField(max_length=255, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     remark = models.CharField(max_length=255, blank=True)
 
     class Meta:
-        unique_together = ('name', 'course')
+        unique_together = ('item', 'course')
