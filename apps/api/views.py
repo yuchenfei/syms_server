@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model, login, logout
 from django.db.models import Q
 from django.http import JsonResponse
@@ -183,7 +185,11 @@ class ExamSettingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = ExamSetting.objects.filter(teacher=user).all()
+        queryset = ExamSetting.objects.filter(teacher=user)
+        date = self.request.query_params.get('date', None)
+        if date:
+            date = datetime.strptime(date, '%Y-%m-%d')
+            queryset = queryset.filter(datetime__date=date)
         return queryset
 
     def create(self, request, *args, **kwargs):
