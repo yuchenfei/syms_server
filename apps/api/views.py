@@ -11,8 +11,8 @@ from rest_framework.views import APIView, exception_handler
 
 from exam.models import ExamSetting
 from exam.serializers import ExamSettingSerializer
-from experiment.models import Experiment
-from experiment.serializers import ExperimentSerializer
+from experiment.models import Experiment, Item
+from experiment.serializers import ExperimentSerializer, ItemSerializer
 from info.models import User, Classes, Course, Student
 from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer, StudentSerializer
 
@@ -141,6 +141,13 @@ class CourseViewSet(viewsets.ModelViewSet):
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):

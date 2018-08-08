@@ -3,6 +3,10 @@ from django.db import models
 from info.models import Course
 
 
+class Item(models.Model):
+    name = models.CharField(max_length=50)
+
+
 class Experiment(models.Model):
     name = models.CharField(max_length=50)
     describe = models.CharField(max_length=255, blank=True)
