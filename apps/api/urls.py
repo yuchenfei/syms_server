@@ -11,6 +11,7 @@ router.register('student', views.StudentViewSet)
 router.register('exam', views.ExamSettingViewSet)
 router.register('item', views.ItemViewSet)
 router.register('experiment', views.ExperimentViewSet)
+router.register('thinking', views.ThinkingViewSet)
 
 urlpatterns = [
     path('login', views.LoginView.as_view()),

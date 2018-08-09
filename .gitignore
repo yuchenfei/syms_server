@@ -6,3 +6,6 @@ gen
 
 # db
 db.sqlite3
+
+# 媒体存储文件夹
+media/

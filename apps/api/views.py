@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets, permissions, exceptions, pagination, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser, FileUploadParser
 from rest_framework.views import APIView, exception_handler
 
 from exam.models import ExamSetting
@@ -15,6 +15,8 @@ from experiment.models import Experiment, Item
 from experiment.serializers import ExperimentSerializer, ItemSerializer
 from info.models import User, Classes, Course, Student
 from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer, StudentSerializer
+from thinking.models import Thinking
+from thinking.serializers import ThinkingSerializer
 
 
 def custom_exception_handler(exc, context):
@@ -202,3 +204,18 @@ class ExamSettingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data['teacher'] = request.user.id
         return super().create(request, *args, **kwargs)
+
+
+class ThinkingViewSet(viewsets.ModelViewSet):
+    queryset = Thinking.objects.all()
+    serializer_class = ThinkingSerializer
+    parser_classes = (MultiPartParser,)
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Thinking.objects.all()
+        item = self.request.query_params.get('item', None)
+        if item:
+            queryset = queryset.filter(item=item)
+        return queryset
