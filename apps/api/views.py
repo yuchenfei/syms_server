@@ -9,8 +9,8 @@ from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser, FileUploadParser
 from rest_framework.views import APIView, exception_handler
 
-from exam.models import ExamSetting
-from exam.serializers import ExamSettingSerializer
+from exam.models import ExamSetting, Question
+from exam.serializers import ExamSettingSerializer, QuestionSerializer
 from experiment.models import Experiment, Item
 from experiment.serializers import ExperimentSerializer, ItemSerializer
 from info.models import User, Classes, Course, Student
@@ -215,6 +215,20 @@ class ThinkingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Thinking.objects.all()
+        item = self.request.query_params.get('item', None)
+        if item:
+            queryset = queryset.filter(item=item)
+        return queryset
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Question.objects.all()
         item = self.request.query_params.get('item', None)
         if item:
             queryset = queryset.filter(item=item)

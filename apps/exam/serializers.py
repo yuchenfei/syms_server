@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ExamSetting
+from .models import ExamSetting, Question
 
 
 class ExamSettingSerializer(serializers.ModelSerializer):
@@ -14,3 +14,9 @@ class ExamSettingSerializer(serializers.ModelSerializer):
         course = instance.experiment.course
         representation['info'] = '{}({})'.format(course.name, course.classes.name)
         return representation
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = '__all__'
