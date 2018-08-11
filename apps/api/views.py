@@ -11,8 +11,8 @@ from rest_framework.views import APIView, exception_handler
 
 from exam.models import ExamSetting, Question
 from exam.serializers import ExamSettingSerializer, QuestionSerializer
-from experiment.models import Experiment, Item, Feedback
-from experiment.serializers import ExperimentSerializer, ItemSerializer, FeedbackSerializer
+from experiment.models import Experiment, Item, Feedback, Grade
+from experiment.serializers import ExperimentSerializer, ItemSerializer, FeedbackSerializer, GradeSerializer
 from info.models import User, Classes, Course, Student
 from info.serializers import UserSerializer, ClassesSerializer, CourseSerializer, StudentSerializer
 from thinking.models import Thinking
@@ -246,4 +246,18 @@ class FeedbackViewSet(viewsets.ModelViewSet):
         item = self.request.query_params.get('item', None)
         if item:
             queryset = queryset.filter(experiment__item=item)
+        return queryset
+
+
+class GradeViewSet(viewsets.ModelViewSet):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = Grade.objects.all()
+        experiment = self.request.query_params.get('experiment', None)
+        if experiment:
+            queryset = queryset.filter(experiment=experiment)
         return queryset

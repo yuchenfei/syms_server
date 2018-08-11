@@ -13,6 +13,7 @@ router.register('question', views.QuestionViewSet)
 router.register('item', views.ItemViewSet)
 router.register('experiment', views.ExperimentViewSet)
 router.register('feedback', views.FeedbackViewSet)
+router.register('grade', views.GradeViewSet)
 router.register('thinking', views.ThinkingViewSet)
 
 urlpatterns = [

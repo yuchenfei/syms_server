@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Experiment, Item, Feedback
+from .models import Experiment, Item, Feedback, Grade
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -27,10 +27,20 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = ('id', 'experiment', 'content', 'datetime')
 
     def to_representation(self, instance):
-        print(instance.datetime)
         representation = super().to_representation(instance)
         representation['datetime'] = instance.datetime.strftime('%Y-%m-%d %H:%M')  # %H:%M:%S
         representation['experimentName'] = instance.experiment.item.name
         representation['courseName'] = instance.experiment.course.name
+        representation['studentName'] = instance.student.name
+        return representation
+
+
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
         representation['studentName'] = instance.student.name
         return representation
