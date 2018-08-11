@@ -7,6 +7,7 @@ from rest_framework import viewsets, permissions, exceptions, pagination, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser, FileUploadParser
+from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from exam.models import ExamSetting, Question
@@ -77,6 +78,9 @@ class CurrentUserView(APIView):
                 'userid': user.id,
                 'name': name if name else user.username
             })
+        response = Response()
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
 
 
 # 暂时解决csrf问题
