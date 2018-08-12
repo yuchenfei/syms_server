@@ -168,12 +168,12 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Experiment.objects.all()
-        name = self.request.query_params.get('name', '')
+        item = self.request.query_params.get('item', '')
         course = self.request.query_params.get('course', '')
         if course:
             queryset = queryset.filter(course=course)
-        if name:
-            queryset = queryset.filter(name=name)
+        if item:
+            queryset = queryset.filter(item=item)
         return queryset
 
 
