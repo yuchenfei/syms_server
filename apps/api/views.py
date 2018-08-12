@@ -74,9 +74,13 @@ class CurrentUserView(APIView):
         user = request.user
         if isinstance(user, User):
             name = user.last_name + user.first_name
+
             return JsonResponse({
-                'userid': user.id,
-                'name': name if name else user.username
+                'currentUser': {
+                    'userid': user.id,
+                    'name': name if name else user.username
+                },
+                'currentAuthority': 'admin' if user.is_admin else 'user'
             })
         response = Response()
         response.status_code = status.HTTP_401_UNAUTHORIZED
