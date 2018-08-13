@@ -1,8 +1,10 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model, login, logout
+from django.core.files.storage import FileSystemStorage
 from django.db.models import Q
 from django.http import JsonResponse
+from openpyxl import load_workbook
 from rest_framework import viewsets, permissions, exceptions, pagination, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
@@ -121,7 +123,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return response
 
     def update(self, request, *args, **kwargs):
-        print(request.data)
         return super().update(request, *args, **kwargs)
 
 
@@ -269,3 +270,44 @@ class GradeViewSet(viewsets.ModelViewSet):
         if experiment:
             queryset = queryset.filter(experiment=experiment)
         return queryset
+
+
+class GradeImportView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        data = request.data.get('data')
+        file = request.data.get('file')
+        experiment = request.data.get('experiment')
+        experiment = Experiment.objects.get(id=experiment)
+        gradeList = Grade.objects.filter(experiment=experiment).all()
+        xhList = [grade.student.xh for grade in gradeList]
+        json = {'status': 'ok', 'data': [], 'warning': []}
+        if file:
+            workbook = load_workbook(file)
+            worksheet = workbook[workbook.sheetnames[0]]
+            for row in worksheet.rows:
+                line = [col.value for col in row]
+                if len(line) != 4:
+                    json['status'] = 'error'
+                    break
+                if line[0] == '学号':
+                    continue
+                xh, name, grade, comment = line
+                if str(xh) in xhList:
+                    json['warning'].append(name)
+                else:
+                    json['data'].append({'xh': str(xh), 'name': name, 'grade': grade, 'comment': comment})
+        if data:
+            grades = []
+            for d in data:
+                student = Student.objects.get(xh=d['xh'])
+                grade = Grade(experiment=experiment,
+                              student=student,
+                              grade=d['grade'],
+                              comment=d['comment'])
+                grades.append(grade)
+            Grade.objects.bulk_create(grades)
+        return JsonResponse(json)
