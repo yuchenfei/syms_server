@@ -22,6 +22,11 @@ class Feedback(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     content = models.TextField()
     datetime = models.DateTimeField(auto_now=True)
+    image1 = models.ImageField(blank=True, upload_to='feedback')
+    image2 = models.ImageField(blank=True, upload_to='feedback')
+    image3 = models.ImageField(blank=True, upload_to='feedback')
+    image4 = models.ImageField(blank=True, upload_to='feedback')
+    image5 = models.ImageField(blank=True, upload_to='feedback')
 
 
 class Grade(models.Model):
