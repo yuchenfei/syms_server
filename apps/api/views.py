@@ -1,14 +1,12 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model, login, logout
-from django.core.files.storage import FileSystemStorage
-from django.db.models import Q
 from django.http import JsonResponse
 from openpyxl import load_workbook
-from rest_framework import viewsets, permissions, exceptions, pagination, status
+from rest_framework import viewsets, permissions, exceptions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.compat import authenticate
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser, FileUploadParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
@@ -80,7 +78,9 @@ class CurrentUserView(APIView):
             return JsonResponse({
                 'currentUser': {
                     'userid': user.id,
-                    'name': name if name else user.username
+                    'name': name if name else user.username,
+                    'last_name': user.last_name,
+                    'first_name': user.first_name,
                 },
                 'currentAuthority': 'admin' if user.is_admin else 'user'
             })
@@ -93,6 +93,27 @@ class CurrentUserView(APIView):
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
+
+
+class SettingView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+
+    def post(self, request):
+        user = request.user
+        password = request.data.get('password')
+        password_new = request.data.get('password_new')
+        last_name = request.data.get('last_name')
+        first_name = request.data.get('first_name')
+        json = {'status': 'ok'}
+        if not user.check_password(password):
+            json['status'] = 'error'
+            return JsonResponse(json)
+        user.last_name = last_name
+        user.first_name = first_name
+        if password_new:
+            user.set_password(password_new)
+        user.save()
+        return JsonResponse(json)
 
 
 class UserViewSet(viewsets.ModelViewSet):
