@@ -35,7 +35,15 @@ def custom_exception_handler(exc, context):
     return response
 
 
+# 暂时解决csrf问题
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
+
+
 class LoginView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+
     def post(self, request):
         username = request.data.get('userName', None)
         password = request.data.get('password', None)
@@ -87,12 +95,6 @@ class CurrentUserView(APIView):
         response = Response()
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
-
-
-# 暂时解决csrf问题
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        return  # To not perform the csrf check previously happening
 
 
 class SettingView(APIView):
