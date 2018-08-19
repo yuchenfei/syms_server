@@ -26,7 +26,7 @@ SECRET_KEY = 'al)cgwzefy!$6hisg&)ug9v+ezwa@m=+cvu@_4&piv7w7$cqhc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'exam.apps.ExamConfig',
     'thinking.apps.ThinkingConfig',
     'api.apps.ApiConfig',
+    'wx.apps.WxConfig',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,7 @@ CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8000'
 )
 CORS_ALLOW_CREDENTIALS = True
+
+# WX interface setting
+APP_ID = os.environ.get('APP_ID')
+APP_SECRET = os.environ.get('APP_SECRET')

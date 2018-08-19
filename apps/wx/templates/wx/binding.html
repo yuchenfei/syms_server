@@ -1,0 +1,30 @@
+{% extends 'wx/base.html' %}
+
+{% block container %}
+    <div class="weui-cells__title">绑定学生</div>
+    <form class="weui-cells weui-cells_form" action="{{ url }}" method="post">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">学号</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="text" name="xh" placeholder="请输入学号"/>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
+            <div class="weui-cell__bd">
+                <input class="weui-input" type="password" name="password" placeholder="请输入密码"/>
+            </div>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}"/>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <div class="weui-btn-area">
+            <button class="weui-btn weui-btn_primary">登陆</button>
+        </div>
+    </form>
+{% endblock %}

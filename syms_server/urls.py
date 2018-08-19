@@ -21,7 +21,8 @@ from syms_server import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls'))
+    path('api/', include('api.urls')),
+    path('wx/', include('wx.urls')),
 ]
 
 if settings.DEBUG:

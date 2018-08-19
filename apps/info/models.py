@@ -21,3 +21,5 @@ class Student(models.Model):
     xh = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=5)
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    openid = models.CharField(max_length=28, blank=True)
+    password = models.CharField(max_length=20, default='123456')
