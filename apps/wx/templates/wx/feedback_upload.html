@@ -1,0 +1,164 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}提交实验反馈{% endblock %}
+
+{% block container %}
+    {% csrf_token %}
+    <div class="weui-cells__title">反馈内容</div>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <textarea class="weui-textarea" id="content" placeholder="请输入文本" rows="3"></textarea>
+                <div class="weui-textarea-counter"><span>0</span>/200</div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-cells__title">附件</div>
+    <div class="weui-cells weui-cells_form" id="uploader">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__hd">
+                        <p class="weui-uploader__title">图片上传(可选)</p>
+                        <div class="weui-uploader__info"><span id="uploadCount">0</span>/5</div>
+                    </div>
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                        <div class="weui-uploader__input-box">
+                            <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*"
+                                   multiple/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <a class="weui-btn  weui-btn_primary" href="javascript:" id="submitBtn">提交</a>
+    </div>
+    <!-- gallery -->
+    <div class="weui-gallery" id="gallery">
+        <span class="weui-gallery__img" id="galleryImg"></span>
+        <div class="weui-gallery__opr">
+            <a href="javascript:" class="weui-gallery__del">
+                <i class="weui-icon-delete weui-icon_gallery-delete"></i>
+            </a>
+        </div>
+    </div>
+    <!-- upload toast -->
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">数据上传中</p>
+        </div>
+    </div>
+    <!-- error toast -->
+    <div id="errorToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-warn weui-icon_toast"></i>
+            <p class="weui-toast__content"><span id="errMsg"></span></p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascript %}
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        const tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>',
+            $content = $("#content"),
+            $uploaderInput = $("#uploaderInput"),
+            $uploaderFiles = $("#uploaderFiles"),
+            $uploaderInputBox = $(".weui-uploader__input-box"),
+            $uploadCount = $("#uploadCount"),
+            $submitBtn = $("#submitBtn"),
+            $gallery = $("#gallery"),
+            $galleryImg = $("#galleryImg"),
+            $galleryDel = $(".weui-gallery__del"),
+            $loadingToast = $('#loadingToast'),
+            $errorToast = $('#errorToast'),
+            $errMsg = $('#errMsg'),
+            csrfToken = $("input[name='csrfmiddlewaretoken']").val()
+        ;
+        let uploadList = [], index = 0;
+        // 选择图片
+        $uploaderInput.on("change", function (e) {
+            var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+            for (var i = 0, len = files.length; i < len; ++i) {
+                var file = files[i];
+                if (url) {
+                    src = url.createObjectURL(file);
+                } else {
+                    src = e.target.result;
+                }
+                $uploaderFiles.append($(tmpl.replace('#url#', src)));
+                uploadList.push(file);
+                $uploadCount.html(uploadList.length);
+                if (uploadList.length >= 5) {
+                    $uploaderInputBox.hide();
+                }
+            }
+        });
+        // 点击预览
+        $uploaderFiles.on("click", "li", function () {
+            index = $(this).index();
+            $galleryImg.attr("style", this.getAttribute("style"));
+            $gallery.fadeIn(100);
+        });
+        // 点击退出预览
+        $gallery.on("click", function () {
+            $gallery.fadeOut(100);
+        });
+        // 删除图片
+        $galleryDel.on("click", function () {
+            $uploaderFiles.find("li").eq(index).remove();
+            uploadList.splice(index, 1);
+            $uploadCount.html(uploadList.length);
+            if (uploadList.length < 5) {
+                $uploaderInputBox.show();
+            }
+        });
+
+        function showErrMsg(errMsg) {
+            $errMsg.html(errMsg);
+            $errorToast.fadeIn(100);
+            setTimeout(function () {
+                $errorToast.fadeOut(100);
+            }, 2000);
+        }
+
+        // 提交
+        $submitBtn.on("click", function () {
+            $loadingToast.fadeIn(100);
+            const formData = new FormData();
+            const xhr = new XMLHttpRequest();
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            formData.append('content', $content.val());
+            Object.keys(uploadList).forEach((key) => {
+                formData.append('image' + key, uploadList[key], uploadList[key].name)
+            });
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    $loadingToast.fadeOut(100);
+                    if (xhr.status === 200) {
+                        try {
+                            const ret = JSON.parse(xhr.responseText);
+                            if (ret.status === "ok") {
+                                window.location.href = ret.url;
+                            } else {
+                                showErrMsg(ret.errMsg);
+                            }
+                        } catch (err) {
+                            showErrMsg('通讯错误');
+                        }
+                    } else {
+                        showErrMsg('网络错误');
+                    }
+                }
+            };
+            xhr.open('POST', '{% url 'feedback-item' id %}');
+            xhr.send(formData)
+        });
+    </script>
+{% endblock %}

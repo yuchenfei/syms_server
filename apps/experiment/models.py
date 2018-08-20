@@ -28,6 +28,9 @@ class Feedback(models.Model):
     image4 = models.ImageField(blank=True, upload_to='feedback')
     image5 = models.ImageField(blank=True, upload_to='feedback')
 
+    class Meta:
+        unique_together = ('experiment', 'student')
+
 
 class Grade(models.Model):
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE)

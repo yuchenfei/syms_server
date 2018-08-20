@@ -2,13 +2,15 @@ import functools
 import hashlib
 
 from django.contrib import messages
-from django.http import HttpResponse, Http404
+from django.db import IntegrityError
+from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from rest_framework.views import APIView
 
-from info.models import Student
+from experiment.models import Experiment, Feedback
+from info.models import Student, Course
 from syms_server import settings
 from .api.login import Login
 from .utils import reverse_absolute_url, redirect_with_next_url
@@ -63,7 +65,7 @@ class Authorized(View):
         return response
 
 
-def openid_required(func):
+def student_required(func):
     """检查Cookie中是否有openid，没有则跳转至微信授权API"""
 
     @functools.wraps(func)
@@ -81,6 +83,7 @@ def openid_required(func):
 
 
 def binding(request):
+    """学生绑定登陆视图"""
     if request.method == 'POST':
         xh = request.POST.get('xh')
         password = request.POST.get('password')
@@ -101,6 +104,54 @@ def binding(request):
     return render(request, 'wx/binding.html', data)
 
 
-@openid_required
+@student_required
 def home(request, student=None):
     return HttpResponse(student.name)
+
+
+@student_required
+def feedback(request, student=None):
+    course_list = Course.objects.filter(classes=student.classes).all()
+    experiment_data = dict()
+    for course in course_list:
+        experiment_list = Experiment.objects.filter(course=course).all()
+        experiment_data.setdefault(course, experiment_list)
+    feedback_list = Feedback.objects.filter(student=student).all()
+    data = dict()
+    data.setdefault('experiment_data', experiment_data)
+    data.setdefault('feedback_list', [i.experiment.id for i in feedback_list])
+    return render(request, 'wx/feedback.html', data)
+
+
+@student_required
+def feedback_item(request, student=None, id=None):
+    experiment = Experiment.objects.get(id=id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        images = request.FILES
+        if not content:
+            return JsonResponse({'status': 'error', 'errMsg': '反馈内容为空'})
+        _feedback = Feedback(
+            experiment=experiment,
+            student=student,
+            content=content,
+        )
+        print(images)
+        for index, key in enumerate(images):
+            setattr(_feedback, 'image' + str(index + 1), images[key])
+        try:
+            _feedback.save()
+        except IntegrityError:
+            return JsonResponse({'status': 'error', 'errMsg': '反馈已提交'})
+        return JsonResponse({'status': 'ok', 'url': reverse_absolute_url(request, 'home')})
+    else:
+        if Feedback.objects.filter(experiment=experiment, student=student).exists():
+            _feedback = Feedback.objects.get(experiment=experiment, student=student)
+            images = []
+            for i in range(1, 6):
+                image = getattr(_feedback, 'image{}'.format(i))
+                if image:
+                    url = request.build_absolute_uri(image.url)
+                    images.append(url)
+            return render(request, 'wx/feedback_item.html', {'feedback': _feedback, 'images': images})
+        return render(request, 'wx/feedback_upload.html', {'id': id})

@@ -11,4 +11,6 @@ urlpatterns = [
     path('authorized', views.Authorized.as_view(), name='authorized'),
     path('binding', views.binding, name='binding'),
     path('home', views.home, name='home'),
+    path('feedback', views.feedback, name='feedback'),
+    path('feedback_item/<int:id>/', views.feedback_item, name='feedback-item'),
 ]
