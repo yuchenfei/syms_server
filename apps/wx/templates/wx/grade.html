@@ -1,0 +1,21 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}我的成绩{% endblock %}
+
+{% block container %}
+    {% for course in course_list %}
+        <div class="weui-cells__title">{{ course.name }}</div>
+        <div class="weui-cells">
+            {% for grade in grade_list %}
+                {% if grade.experiment.course == course %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'grade-item' grade.id %}">
+                        <div class="weui-cell__bd">
+                            <p>{{ grade.experiment.item.name }}</p>
+                        </div>
+                        <div class="weui-cell__ft">{{ grade.grade }}</div>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}

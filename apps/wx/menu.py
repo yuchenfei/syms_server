@@ -30,7 +30,7 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "成绩",
-                        "url": "http://syms-server.flyingspace.cn/wx/home"
+                        "url": "http://syms-server.flyingspace.cn/wx/grade"
                     },
                     {
                         "type": "view",

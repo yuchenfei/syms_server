@@ -16,4 +16,7 @@ urlpatterns = [
     path('feedback_success/<int:experiment_id>/', views.feedback_success, name='feedback-success'),
     path('thinking', views.thinking, name='thinking'),
     path('thinking_item/<int:experiment_id>/', views.thinking_item, name='thinking-item'),
+    path('grade', views.grade, name='grade'),
+    path('grade_item/<int:grade_id>/', views.grade_item, name='grade-item'),
+
 ]

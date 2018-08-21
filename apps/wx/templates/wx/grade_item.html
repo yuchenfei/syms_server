@@ -1,0 +1,24 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}
+    {{ grade.experiment.course.name }}/{{ grade.experiment.item.name }} 成绩
+{% endblock %}
+
+{% block container %}
+    <div class="weui-cells__title">分数</div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>{{ grade.grade }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="weui-cells__title">评语</div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>{{ grade.comment|default:"无" }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

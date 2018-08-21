@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views import View
 from rest_framework.views import APIView
 
-from experiment.models import Experiment, Feedback
+from experiment.models import Experiment, Feedback, Grade
 from info.models import Student, Course
 from syms_server import settings
 from thinking.models import Thinking
@@ -200,3 +200,20 @@ def thinking_item(request, student=None, experiment_id=None):
     else:
         _thinking = _thinking.first()
     return render(request, 'wx/thinking_item.html', {'thinking': _thinking, 'experiment': experiment})
+
+
+@student_required
+def grade(request, student=None):
+    grade_list = Grade.objects.filter(student=student).all()
+    experiment_list = [i.experiment for i in grade_list]
+    course_list = set(Course.objects.filter(experiment__in=experiment_list).all())
+    data = dict()
+    data.setdefault('course_list', course_list)
+    data.setdefault('grade_list', grade_list)
+    return render(request, 'wx/grade.html', data)
+
+
+@student_required
+def grade_item(request, student=None, grade_id=None):
+    _grade = Grade.objects.get(id=grade_id)
+    return render(request, 'wx/grade_item.html', {'grade': _grade})
