@@ -192,6 +192,7 @@ def thinking_item(request, student=None, experiment_id=None):
     experiment = Experiment.objects.get(id=experiment_id)
     _feedback = Feedback.objects.get(experiment=experiment, student=student)
     _thinking = Thinking.objects.filter(id=_feedback.thinking_id)
+    image_url = ''
     if not _thinking.exists():  # 不存在思考题时尝试选择，题库为空则在模板中显示
         _thinking = get_random_thinking(experiment.item)
         if _thinking:
@@ -199,6 +200,12 @@ def thinking_item(request, student=None, experiment_id=None):
             _feedback.save()
     else:
         _thinking = _thinking.first()
+        if _thinking.picture:
+            image_url = request.build_absolute_uri(_thinking.picture)
+    data = dict()
+    data.setdefault('experiment', experiment)
+    data.setdefault('thinking', _thinking)
+    data.setdefault('image', image_url)
     return render(request, 'wx/thinking_item.html', {'thinking': _thinking, 'experiment': experiment})
 
 
