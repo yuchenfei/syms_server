@@ -1,12 +1,18 @@
 {% extends 'wx/base.html' %}
 
+{% block title %}
+    {{ feedback.experiment.item.name }} 反馈
+{% endblock %}
+
 {% block container %}
-    <article class="weui-article">
-        <h1>实验 {{ feedback.experiment.item.name }} 反馈</h1>
-        <section>
-            <p>{{ feedback.content }}</p>
-        </section>
-    </article>
+    <div class="weui-cells__title">反馈内容</div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>{{ feedback.content }}</p>
+            </div>
+        </div>
+    </div>
     {% if images %}
         <div class="weui-cells__title">附件</div>
         <div class="weui-cells weui-cells_form" id="uploader">
