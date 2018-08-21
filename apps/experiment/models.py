@@ -27,6 +27,7 @@ class Feedback(models.Model):
     image3 = models.ImageField(blank=True, upload_to='feedback')
     image4 = models.ImageField(blank=True, upload_to='feedback')
     image5 = models.ImageField(blank=True, upload_to='feedback')
+    thinking_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         unique_together = ('experiment', 'student')

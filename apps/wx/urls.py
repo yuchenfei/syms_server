@@ -12,5 +12,8 @@ urlpatterns = [
     path('binding', views.binding, name='binding'),
     path('home', views.home, name='home'),
     path('feedback', views.feedback, name='feedback'),
-    path('feedback_item/<int:id>/', views.feedback_item, name='feedback-item'),
+    path('feedback_item/<int:experiment_id>/', views.feedback_item, name='feedback-item'),
+    path('feedback_success/<int:experiment_id>/', views.feedback_success, name='feedback-success'),
+    path('thinking', views.thinking, name='thinking'),
+    path('thinking_item/<int:experiment_id>/', views.thinking_item, name='thinking-item'),
 ]

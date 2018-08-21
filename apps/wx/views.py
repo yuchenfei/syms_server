@@ -1,5 +1,6 @@
 import functools
 import hashlib
+import random
 
 from django.contrib import messages
 from django.db import IntegrityError
@@ -12,6 +13,7 @@ from rest_framework.views import APIView
 from experiment.models import Experiment, Feedback
 from info.models import Student, Course
 from syms_server import settings
+from thinking.models import Thinking
 from .api.login import Login
 from .utils import reverse_absolute_url, redirect_with_next_url
 
@@ -123,9 +125,17 @@ def feedback(request, student=None):
     return render(request, 'wx/feedback.html', data)
 
 
+def get_random_thinking(item):
+    thinking_list = Thinking.objects.filter(item=item)
+    if thinking_list.exists():
+        return random.sample(list(thinking_list), 1)[0]
+    else:
+        return None
+
+
 @student_required
-def feedback_item(request, student=None, id=None):
-    experiment = Experiment.objects.get(id=id)
+def feedback_item(request, student=None, experiment_id=None):
+    experiment = Experiment.objects.get(id=experiment_id)
     if request.method == 'POST':
         content = request.POST.get('content')
         images = request.FILES
@@ -136,14 +146,17 @@ def feedback_item(request, student=None, id=None):
             student=student,
             content=content,
         )
-        print(images)
+        _thinking = get_random_thinking(experiment.item)
+        if _thinking:
+            _feedback.thinking_id = _thinking.id
         for index, key in enumerate(images):
             setattr(_feedback, 'image' + str(index + 1), images[key])
         try:
             _feedback.save()
         except IntegrityError:
-            return JsonResponse({'status': 'error', 'errMsg': '反馈已提交'})
-        return JsonResponse({'status': 'ok', 'url': reverse_absolute_url(request, 'home')})
+            return JsonResponse({'status': 'error', 'errMsg': '已反馈'})
+        url = request.build_absolute_uri(reverse('feedback-success', args=(experiment_id,)))
+        return JsonResponse({'status': 'ok', 'url': url})
     else:
         if Feedback.objects.filter(experiment=experiment, student=student).exists():
             _feedback = Feedback.objects.get(experiment=experiment, student=student)
@@ -154,4 +167,36 @@ def feedback_item(request, student=None, id=None):
                     url = request.build_absolute_uri(image.url)
                     images.append(url)
             return render(request, 'wx/feedback_item.html', {'feedback': _feedback, 'images': images})
-        return render(request, 'wx/feedback_upload.html', {'id': id})
+        return render(request, 'wx/feedback_upload.html', {'id': experiment_id})
+
+
+@student_required
+def feedback_success(request, student=None, experiment_id=None):
+    experiment = Experiment.objects.get(id=experiment_id)
+    return render(request, 'wx/feedback_success.html', {'experiment': experiment})
+
+
+@student_required
+def thinking(request, student=None):
+    feedback_list = Feedback.objects.filter(student=student).all()
+    experiment_list = [i.experiment for i in feedback_list]
+    course_list = set(Course.objects.filter(experiment__in=experiment_list).all())
+    data = dict()
+    data.setdefault('course_list', course_list)
+    data.setdefault('experiment_list', experiment_list)
+    return render(request, 'wx/thinking.html', data)
+
+
+@student_required
+def thinking_item(request, student=None, experiment_id=None):
+    experiment = Experiment.objects.get(id=experiment_id)
+    _feedback = Feedback.objects.get(experiment=experiment, student=student)
+    _thinking = Thinking.objects.filter(id=_feedback.thinking_id)
+    if not _thinking.exists():  # 不存在思考题时尝试选择，题库为空则在模板中显示
+        _thinking = get_random_thinking(experiment.item)
+        if _thinking:
+            _feedback.thinking_id = _thinking.id
+            _feedback.save()
+    else:
+        _thinking = _thinking.first()
+    return render(request, 'wx/thinking_item.html', {'thinking': _thinking, 'experiment': experiment})

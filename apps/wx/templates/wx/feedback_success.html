@@ -1,0 +1,16 @@
+{% extends 'wx/base.html' %}
+
+{% block container %}
+    <div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">操作成功</h2>
+            <p class="weui-msg__desc">{{ experiment.item.name }} 反馈提交成功，可以查看思考题</p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="{% url 'thinking-item' experiment.id %}" class="weui-btn weui-btn_primary">查看思考题</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

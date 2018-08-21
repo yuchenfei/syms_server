@@ -1,4 +1,4 @@
-from .utils import MyOfficialAccounts
+from wx.utils import MyOfficialAccounts
 
 
 def create_menu():
@@ -19,7 +19,7 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "思考题",
-                        "url": "http://syms-server.flyingspace.cn/wx/home"
+                        "url": "http://syms-server.flyingspace.cn/wx/thinking"
                     }
                 ]
             },
@@ -44,6 +44,3 @@ def create_menu():
     """
     official_account = MyOfficialAccounts()
     official_account.create_menu(menu)
-
-if __name__ == '__main__':
-    create_menu()
