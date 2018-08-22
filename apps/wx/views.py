@@ -201,12 +201,12 @@ def thinking_item(request, student=None, experiment_id=None):
     else:
         _thinking = _thinking.first()
         if _thinking.picture:
-            image_url = request.build_absolute_uri(_thinking.picture)
+            image_url = request.build_absolute_uri(_thinking.picture.url)
     data = dict()
     data.setdefault('experiment', experiment)
     data.setdefault('thinking', _thinking)
     data.setdefault('image', image_url)
-    return render(request, 'wx/thinking_item.html', {'thinking': _thinking, 'experiment': experiment})
+    return render(request, 'wx/thinking_item.html', data)
 
 
 @student_required
