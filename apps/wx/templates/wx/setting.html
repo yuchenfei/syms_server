@@ -1,0 +1,162 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}个人设置{% endblock %}
+
+{% block container %}
+    <form id="form" action="{% url 'setting' %}" method="post">
+        {% csrf_token %}
+        <div class="weui-cells__title">基础信息</div>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" id="name">
+                <div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="name" placeholder="请输入姓名" value="{{ student.name }}"/>
+                </div>
+                <div class="weui-cell__ft">
+                    <i class="weui-icon-warn"></i>
+                </div>
+            </div>
+        </div>
+        <div class="weui-cells__title">修改密码</div>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">新密码</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="password" name="password_new" placeholder="请输入新密码"/>
+                </div>
+            </div>
+            <div class="weui-cell" id="confirm">
+                <div class="weui-cell__hd"><label class="weui-label">确认密码</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="password" name="confirm" placeholder="请输入确认密码"/>
+                </div>
+                <div class="weui-cell__ft">
+                    <i class="weui-icon-warn"></i>
+                </div>
+            </div>
+        </div>
+        <div class="weui-cells__title">确认身份（必填）</div>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" id="password">
+                <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="password" name="password" placeholder="请输入密码"/>
+                </div>
+                <div class="weui-cell__ft">
+                    <i class="weui-icon-warn"></i>
+                </div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <a class="weui-btn  weui-btn_primary" href="javascript:" id="submitBtn">提交</a>
+        </div>
+    </form>
+    <!-- upload toast -->
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">数据上传中</p>
+        </div>
+    </div>
+    <!-- success toast-->
+    <div id="successToast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">修改成功</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascript %}
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
+    <script type="text/javascript">
+        const
+            $nameInput = $("input[name='name']"),
+            $nameDiv = $("#name"),
+            $passwordNewInput = $("input[name='password_new']"),
+            $confirmInput = $("input[name='confirm']"),
+            $confirmDiv = $("#confirm"),
+            $passwordInput = $("input[name='password']"),
+            $passwordDiv = $("#password"),
+            $submitBtn = $("#submitBtn"),
+            $loadingToast = $('#loadingToast'),
+            $successToast = $('#successToast'),
+            $form = $("#form")
+        ;
+        let confirmDirty = false;
+
+        function checkConfirm() {
+            const passwordNew = $passwordNewInput.val();
+            const confirm = $confirmInput.val();
+            if (confirm !== passwordNew) {
+                weui.topTips("两次输入的密码不一致!");
+                $confirmDiv.addClass("weui-cell_warn");
+            } else {
+                $confirmDiv.removeClass("weui-cell_warn");
+            }
+        }
+
+        $passwordNewInput.on("input", () => {
+            const value = $passwordNewInput.val();
+            if (value && confirmDirty) {
+                checkConfirm();
+            } else {
+                $confirmDiv.removeClass("weui-cell_warn");
+            }
+        });
+        $confirmInput.on("input", checkConfirm);
+        $confirmInput.on("blur", () => {// 仅第一次输入新密码时不用校验
+            confirmDirty = confirmDirty || !!this.value;
+        });
+        $nameInput.on('input', () => {
+            if ($nameInput.val()) {
+                $nameDiv.removeClass("weui-cell_warn");
+            }
+        });
+        $passwordInput.on("input", () => {
+            if ($passwordInput.val())
+                $passwordDiv.removeClass("weui-cell_warn");
+        });
+        $submitBtn.on("click", () => {
+            if (!$nameInput.val()) {
+                weui.topTips("请输入姓名!");
+                $nameDiv.addClass("weui-cell_warn");
+                return
+            }
+            if (!$passwordInput.val()) {
+                weui.topTips("请输入密码!");
+                $passwordDiv.addClass("weui-cell_warn");
+                return
+            }
+            $.ajax({
+                url: $form.attr("action"),
+                type: $form.attr("method"),
+                data: $form.serialize(),
+                dataType: "json",
+                beforeSend: () => {
+                    $loadingToast.fadeIn(100);
+                },
+                complete: () => {
+                    $loadingToast.fadeOut(100);
+                },
+                success: (data) => {
+                    if (data.status === 'ok') {
+                        $successToast.fadeIn(100);
+                        setTimeout(function () {
+                            $successToast.fadeOut(100);
+                        }, 2000);
+                        $passwordNewInput.val("");
+                        $confirmInput.val("");
+                        $passwordInput.val("");
+                    } else {
+                        weui.topTips("密码错误！");
+                        $passwordDiv.addClass("weui-cell_warn");
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

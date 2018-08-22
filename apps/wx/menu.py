@@ -34,8 +34,8 @@ def create_menu():
                     },
                     {
                         "type": "view",
-                        "name": "修改密码",
-                        "url": "http://syms-server.flyingspace.cn/wx/home"
+                        "name": "个人设置",
+                        "url": "http://syms-server.flyingspace.cn/wx/setting"
                     }
                 ]
             }

@@ -224,3 +224,18 @@ def grade(request, student=None):
 def grade_item(request, student=None, grade_id=None):
     _grade = Grade.objects.get(id=grade_id)
     return render(request, 'wx/grade_item.html', {'grade': _grade})
+
+
+@student_required
+def setting(request, student=None):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        password_new = request.POST.get('password_new')
+        password = request.POST.get('password')
+        if password != student.password:
+            return JsonResponse({'status': 'err', 'errMsg': '密码错误'})
+        student.name = name
+        student.password = password_new
+        student.save()
+        return JsonResponse({'status': 'ok'})
+    return render(request, 'wx/setting.html', {'student': student})

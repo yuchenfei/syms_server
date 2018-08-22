@@ -18,5 +18,5 @@ urlpatterns = [
     path('thinking_item/<int:experiment_id>/', views.thinking_item, name='thinking-item'),
     path('grade', views.grade, name='grade'),
     path('grade_item/<int:grade_id>/', views.grade_item, name='grade-item'),
-
+    path('setting', views.setting, name='setting'),
 ]
