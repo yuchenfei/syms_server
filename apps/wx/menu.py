@@ -13,6 +13,11 @@ def create_menu():
                 [
                     {
                         "type": "view",
+                        "name": "在线答题",
+                        "url": "http://syms-server.flyingspace.cn/wx/exam_select"
+                    },
+                    {
+                        "type": "view",
                         "name": "反馈",
                         "url": "http://syms-server.flyingspace.cn/wx/feedback"
                     },
@@ -43,4 +48,5 @@ def create_menu():
     }
     """
     official_account = MyOfficialAccounts()
-    official_account.create_menu(menu)
+    print('创建微信自定义菜单:')
+    print(official_account.create_menu(menu))

@@ -19,4 +19,6 @@ urlpatterns = [
     path('grade', views.grade, name='grade'),
     path('grade_item/<int:grade_id>/', views.grade_item, name='grade-item'),
     path('setting', views.setting, name='setting'),
+    path('exam_select', views.exam_select, name='exam-select'),
+    path('exam/<int:exam_id>/', views.exam, name='exam'),
 ]

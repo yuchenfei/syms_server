@@ -1,8 +1,11 @@
 import functools
 import hashlib
+import json
 import random
+from datetime import datetime, timedelta
 
 from django.contrib import messages
+from django.core.cache import cache
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import redirect, render
@@ -10,6 +13,7 @@ from django.urls import reverse
 from django.views import View
 from rest_framework.views import APIView
 
+from exam.models import ExamSetting, Question, ExamRecord
 from experiment.models import Experiment, Feedback, Grade
 from info.models import Student, Course
 from syms_server import settings
@@ -239,3 +243,65 @@ def setting(request, student=None):
         student.save()
         return JsonResponse({'status': 'ok'})
     return render(request, 'wx/setting.html', {'student': student})
+
+
+@student_required
+def exam_select(request, student=None):
+    exam_query = ExamSetting.objects.filter(experiment__course__classes=student.classes).all()
+    exam_list = list()
+    for _exam in exam_query:
+        # 过滤在有效时间内的在线答题设置
+        if _exam.datetime + timedelta(minutes=_exam.duration) > datetime.now():
+            exam_list.append(_exam)
+    return render(request, 'wx/exam_select.html', {'exam_list': exam_list})
+
+
+@student_required
+def exam(request, student=None, exam_id=None):
+    _exam = ExamSetting.objects.get(id=exam_id)
+    if request.method == 'POST':
+        options = json.loads(request.POST.get('options'))
+        answer_key = 'exam_{}'.format(exam_id)
+        answer = cache.get(answer_key)
+        if not answer:
+            questions = [Question.objects.get(id=i) for i in _exam.questions.split(',')]
+            answer = dict()
+            for question in questions:
+                answer.setdefault(question.id, question.answer)
+            cache.set(answer_key, answer, (_exam.duration + 5) * 60)  # 多存五分钟
+        count = 0
+        for option in options:
+            if answer.get(option.get('id')) == option.get('option'):
+                count = count + 1
+        result = int(count * 100 / len(answer))
+        record = ExamRecord(setting=_exam, student=student, result=result)
+        record.save()
+        return JsonResponse({'status': 'ok', 'result': result, 'count': count})
+    # GET
+    if ExamRecord.objects.filter(setting=_exam, student=student).exists():
+        return render(request, 'wx/error.html', {'errMsg': '已完成答题'})
+    questions_key = 'questions_{}'.format(exam_id)
+    questions = cache.get(questions_key)
+    if not questions:
+        questions = [Question.objects.get(id=i) for i in _exam.questions.split(',')]
+        cache.set(questions_key, questions, (_exam.duration + 5) * 60)
+    question_list = [{
+        'id': i.id,
+        'title': i.title,
+        'a': i.a,
+        'b': i.b,
+        'c': i.c,
+        'd': i.d
+    } for i in questions]
+    random.shuffle(question_list)
+    time_remain = int(_exam.duration) * 60 - (datetime.now() - _exam.datetime).seconds
+    if time_remain < 0:
+        time_remain = -1
+    elif time_remain < 60:
+        time_remain = 60
+    print(time_remain)
+    data = dict()
+    data.setdefault('exam', _exam)
+    data.setdefault('data', json.dumps(question_list))
+    data.setdefault('time_remain', time_remain)
+    return render(request, 'wx/exam.html', data)

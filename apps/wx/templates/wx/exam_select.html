@@ -1,0 +1,26 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}在线答题{% endblock %}
+
+{% block container %}
+    <div class="weui-cells__title">选择实验</div>
+    <div class="weui-cells">
+        {% if exam_list %}
+            {% for exam in exam_list %}
+                <a class="weui-cell weui-cell_access" href="{% url 'exam' exam.id %}">
+                    <div class="weui-cell__bd">
+                        <p>{{ exam.experiment.course.name }}/{{ exam.experiment.item.name }}</p>
+                    </div>
+                    <div class="weui-cell__ft"></div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <p>暂无进行中的在线答题</p>
+                </div>
+                <div class="weui-cell__ft"></div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

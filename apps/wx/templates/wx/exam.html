@@ -1,0 +1,317 @@
+{% extends 'wx/base.html' %}
+
+{% block title %}{{ exam.experiment.item.name }} 在线答题{% endblock %}
+
+{% block extrahead %}
+    <style type="text/css">
+        .am-notice-bar {
+            background-color: #fefcec;
+            height: 36px;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 36px;
+            color: #f76a24;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .am-notice-bar-content {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            width: 100%;
+            margin: auto 15px;
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .am-notice-bar-icon {
+            margin-left: 15px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+
+        .am-notice-bar-icon + div {
+            margin-left: 5px;
+        }
+
+        .am-icon {
+            fill: currentColor;
+            background-size: cover;
+            width: 22px;
+            height: 22px;
+        }
+
+        .am-icon-xxs {
+            width: 15px;
+            height: 15px;
+        }
+    </style>
+{% endblock %}
+
+{% block container %}
+    <div id="main">
+        <!-- notice bar -->
+        <div class="am-notice-bar" role="alert">
+            <div class="am-notice-bar-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" class="am-icon am-icon-voice am-icon-xxs">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#voice"></use>
+                    <svg id="voice" viewBox="0 0 38 33" width="100%" height="100%">
+                        <g fill-rule="evenodd">
+                            <path d="M17.838 28.8c-.564-.468-1.192-.983-1.836-1.496-4.244-3.385-5.294-3.67-6.006-3.67-.014 0-.027.005-.04.005-.015 0-.028-.006-.042-.006H3.562c-.734 0-.903-.203-.903-.928v-12.62c0-.49.057-.8.66-.8H9.1c.694 0 1.76-.28 6.4-3.63.83-.596 1.638-1.196 2.337-1.722V28.8zM19.682.19c-.463-.22-1.014-.158-1.417.157-.02.016-1.983 1.552-4.152 3.125C10.34 6.21 9.243 6.664 9.02 6.737H3.676c-.027 0-.053.003-.08.004H1.183c-.608 0-1.1.487-1.1 1.086V25.14c0 .598.492 1.084 1.1 1.084h8.71c.22.08 1.257.55 4.605 3.24 1.947 1.562 3.694 3.088 3.712 3.103.25.22.568.333.89.333.186 0 .373-.038.55-.116.48-.213.79-.684.79-1.204V1.38c0-.506-.294-.968-.758-1.19z"
+                                  mask="url(#mask-2)"></path>
+                            <path d="M31.42 16.475c0-3.363-1.854-6.297-4.606-7.876-.125-.067-.42-.193-.625-.193-.613 0-1.11.488-1.11 1.09 0 .404.22.764.55.952 2.13 1.19 3.566 3.44 3.566 6.024 0 2.627-1.486 4.913-3.677 6.087-.32.19-.53.54-.53.935 0 .602.495 1.09 1.106 1.09.26.002.568-.15.568-.15 2.835-1.556 4.754-4.538 4.754-7.96"
+                                  mask="url(#mask-4)"></path>
+                            <path d="M30.14 3.057c-.205-.122-.41-.22-.658-.22-.608 0-1.1.485-1.1 1.084 0 .434.26.78.627.978 4.042 2.323 6.76 6.636 6.76 11.578 0 4.938-2.715 9.248-6.754 11.572-.354.19-.66.55-.66.993 0 .6.494 1.085 1.102 1.085.243 0 .438-.092.65-.213 4.692-2.695 7.848-7.7 7.848-13.435 0-5.723-3.142-10.718-7.817-13.418"
+                                  mask="url(#mask-6)"></path>
+                        </g>
+                    </svg>
+                </svg>
+            </div>
+            <div class="am-notice-bar-content">
+                <div class="am-notice-bar-marquee-wrap " role="marquee" style="overflow: hidden;">
+                    <div class="am-notice-bar-marquee"
+                         style="position: relative; right: 0; white-space: nowrap; display: inline-block; padding: 0 8px;">
+                        剩余时间：<span id="count_down"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- multiple choices question -->
+        <form id="form" action="{% url 'exam' exam.id %}" method="post">
+            {% csrf_token %}
+            <div class="weui-cells__title"><span id="index"></span>/<span id="total"></span>: <span id="title"></span>
+            </div>
+            <div class="weui-cells weui-cells_radio">
+                <label class="weui-cell weui-check__label" for="option_a">
+                    <div class="weui-cell__bd">
+                        <p>A:<span id="a"></span></p>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <input class="weui-check" id="option_a" name="option" type="radio" value="a" required
+                               tips="请选择选项"/>
+                        <span class="weui-icon-checked"></span>
+                    </div>
+                </label>
+                <label class="weui-cell weui-check__label" for="option_b">
+                    <div class="weui-cell__bd">
+                        <p>B:<span id="b"></span></p>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <input class="weui-check" id="option_b" name="option" type="radio" value="b"/>
+                        <span class="weui-icon-checked"></span>
+                    </div>
+                </label>
+                <label class="weui-cell weui-check__label" for="option_c">
+                    <div class="weui-cell__bd">
+                        <p>C:<span id="c"></span></p>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <input class="weui-check" id="option_c" name="option" type="radio" value="c"/>
+                        <span class="weui-icon-checked"></span>
+                    </div>
+                </label>
+                <label class="weui-cell weui-check__label" for="option_d">
+                    <div class="weui-cell__bd">
+                        <p>D:<span id="d"></span></p>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <input class="weui-check" id="option_d" name="option" type="radio" value="d"/>
+                        <span class="weui-icon-checked"></span>
+                    </div>
+                </label>
+            </div>
+        </form>
+        <!-- button -->
+        <div class="weui-btn-area weui-footer_fixed-bottom">
+            <a class="weui-btn weui-btn_default weui-btn_disabled" id="previousBtn" href="javascript:">上一题</a>
+            <a class="weui-btn weui-btn_default" id="nextBtn" href="javascript:">下一题</a>
+            <a class="weui-btn  weui-btn_primary weui-btn_disabled" id="submitBtn" href="javascript:">提交</a>
+        </div>
+    </div>
+    <!-- msg success -->
+    <div class="weui-msg" id="msgSuccess" style="display:none">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">提交成功</h2>
+            <p class="weui-msg__desc"><span id="status"></span>, 得分 <span id="result"></span> 分</p>
+        </div>
+    </div>
+    <!-- msg error -->
+    <div class="weui-msg" id="msgError" style="display:none">
+        <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">失败</h2>
+            <p class="weui-msg__desc"><span id="errMsg"></span></p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascript %}
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
+    <script type="text/javascript">
+        const
+            $mainDiv = $("#main"), $msgSuccess = $("#msgSuccess"), $msgError = $("#msgError"),
+            $count_down = $("#count_down"),
+            $form = $("#form"),
+            $index = $("#index"),
+            $total = $("#total"),
+            $title = $("#title"),
+            $a = $("#a"), $b = $("#b"), $c = $("#c"), $d = $("#d"),
+            $previousBtn = $("#previousBtn"),
+            $nextBtn = $("#nextBtn"),
+            $submitBtn = $("#submitBtn"),
+            $status = $("#status"), $result = $("#result"), $errMsg = $("#errMsg"),
+            csrfToken = $("input[name='csrfmiddlewaretoken']").val()
+        ;
+        const question_list = JSON.parse('{{ data | safe }}');
+        const total = question_list.length;
+        let time_remain = {{ time_remain }};
+        let index = 0;
+        let loading;
+
+        $(document).ready(function () {
+            if (time_remain < 0) {
+                $errMsg.html("已过答题时间");
+                $mainDiv.hide();
+                $msgError.show();
+                return;
+            }
+
+            // 初始化渲染
+            if (question_list.length > 0) {
+                $total.html(total);
+                render_question();
+                count_down();
+            }
+        });
+
+        $(":radio").click(function () {
+            question_list[index].option = $form.find('input[type="radio"][name="option"]:checked').val();
+            let flag = true;
+            $.each(question_list, (index, question) => {
+                flag = flag && !!question.option;
+            });
+            if (flag) {
+                $submitBtn.removeClass("weui-btn_disabled");
+            }
+        });
+        $previousBtn.on("click", () => {
+            if ($previousBtn.hasClass("weui-btn_disabled"))
+                return;
+            --index;
+            render_question();
+        });
+        $nextBtn.on("click", () => {
+            if ($nextBtn.hasClass("weui-btn_disabled"))
+                return;
+            weui.form.validate($form);
+            if (question_list[index].option) {  // 选择选项后才能下一题
+                ++index;
+                render_question();
+            }
+        });
+        $submitBtn.on("click", upload);
+
+        function upload() {
+            let options = [];
+            $.each(question_list, (index, question) => {
+                options.push({id: question.id, option: question.option});
+            });
+            $.ajax({
+                url: $form.attr("action"),
+                type: $form.attr("method"),
+                data: {csrfmiddlewaretoken: csrfToken, options: JSON.stringify(options)},
+                dataType: "json",
+                beforeSend: () => {
+                    loading = weui.loading('提交中');
+                },
+                complete: () => {
+                    loading.hide();
+                },
+                success: (data) => {
+                    if (data.status === 'ok') {
+                        const count = data.count;
+                        const result = data.result;
+                        $status.html("答对 " + count + " 题共 " + total + " 题");
+                        $result.html(result);
+                        $mainDiv.hide();
+                        $msgSuccess.show();
+                    } else {
+
+                    }
+                }
+            })
+        }
+
+        function time_out() {
+            // 时间到
+            weui.topTips("时间到，自动提交...");
+            upload();
+        }
+
+        function fill_zero_prefix(num) {
+            // 小于10补零
+            return num < 10 ? "0" + num : num
+        }
+
+        function count_down() {
+            const min = fill_zero_prefix(Math.floor(time_remain / 60));
+            const sec = fill_zero_prefix(time_remain - min * 60);
+            const str = min + ":" + sec;
+            $count_down.html(str);
+            if (time_remain <= 0) {
+                time_out();
+                return;
+            }
+            setTimeout(() => {
+                time_remain -= 1;
+                count_down();
+            }, 1000)
+        }
+
+        function render_question() {
+            // 配置上一题/下一题按钮逻辑
+            if (index > 0) {
+                $previousBtn.removeClass("weui-btn_disabled");
+            } else {
+                $previousBtn.addClass("weui-btn_disabled");
+            }
+            if (index < total - 1) {
+                $nextBtn.removeClass("weui-btn_disabled");
+            } else {
+                $nextBtn.addClass("weui-btn_disabled");
+            }
+            // 渲染题目相关内容
+            const question = question_list[index];
+            $index.html(index + 1);
+            $title.html(question.title);
+            $a.html(question.a);
+            $b.html(question.b);
+            $c.html(question.c);
+            $d.html(question.d);
+            // 清除选项
+            const radioInputs = $('input[type="radio"]');
+            for (let i = 0, len = radioInputs.length; i < len; ++i) {
+                radioInputs[i].checked = false;
+            }
+            // 有记录则勾选选项
+            if (!!question.option) {
+                const option = $("#option_" + question.option);
+                option.prop('checked', true);
+            }
+        }
+    </script>
+{% endblock %}
