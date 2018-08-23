@@ -1,30 +1,35 @@
 {% extends 'wx/base.html' %}
 
+{% block title %}{{ thinking.item.name }} 思考题{% endblock %}
+
 {% block container %}
     {% if thinking %}
-        <article class="weui-article">
-            <h1>{{ thinking.item.name }} 思考题</h1>
-            <section>
-                <p>{{ thinking.title }}</p>
-            </section>
-            {% if image %}
-                <div class="weui-cells__title">附件</div>
-                <div class="weui-cells weui-cells_form" id="uploader">
-                    <div class="weui-cell">
-                        <div class="weui-cell__bd">
-                            <div class="weui-uploader">
-                                <div class="weui-uploader__bd">
-                                    <ul class="weui-uploader__files" id="uploaderFiles">
-                                        <li class="weui-uploader__file"
-                                            style="background-image:url('{{ image }}')"></li>
-                                    </ul>
-                                </div>
+
+        <div class="weui-cells__title">题目</div>
+        <div class="weui-cells">
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <p>{{ thinking.title }}</p>
+                </div>
+            </div>
+        </div>
+        {% if image %}
+            <div class="weui-cells__title">附件</div>
+            <div class="weui-cells weui-cells_form" id="uploader">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <div class="weui-uploader">
+                            <div class="weui-uploader__bd">
+                                <ul class="weui-uploader__files" id="uploaderFiles">
+                                    <li class="weui-uploader__file"
+                                        style="background-image:url('{{ image }}')"></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        </article>
+            </div>
+        {% endif %}
     {% else %}
         <div class="weui-msg">
             <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
