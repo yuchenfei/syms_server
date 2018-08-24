@@ -99,9 +99,12 @@ def binding(request):
         if Student.objects.filter(xh=xh).exists():
             student = Student.objects.get(xh=xh)
             if password == student.password:
-                student.openid = openid
-                student.save()
-                return redirect(next_url)
+                if student.openid:
+                    data.setdefault('errMsg', '账号已与其他微信绑定')
+                else:
+                    student.openid = openid
+                    student.save()
+                    return redirect(next_url)
             else:
                 data.setdefault('errMsg', '学号或密码错误')
         else:
