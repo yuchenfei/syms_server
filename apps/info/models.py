@@ -11,10 +11,13 @@ class Classes(models.Model):
 
 
 class Course(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
     term = models.CharField(max_length=50)
     status = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('name', 'classes')
 
 
 class Student(models.Model):
