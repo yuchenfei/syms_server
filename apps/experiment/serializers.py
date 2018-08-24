@@ -47,6 +47,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
         representation['experimentName'] = instance.experiment.item.name
         representation['courseName'] = instance.experiment.course.name
         representation['studentName'] = instance.student.name
+        representation['studentXH'] = instance.student.xh
         return representation
 
 
