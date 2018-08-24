@@ -2,24 +2,6 @@
 
 {% block title %}登陆{% endblock %}
 
-{% block extrahead %}
-    <style type="text/css">
-        .alert {
-            text-align: center;
-            margin: 5px 15px;
-            padding: 5px;
-            border: 1px solid transparent;
-            border-radius: 5px
-        }
-
-        .alert-danger {
-            background-color: #d9534f;
-            border-color: transparent;
-            color: #ffffff
-        }
-    </style>
-{% endblock %}
-
 {% block container %}
     <form action="{{ url }}" method="post">
         {% csrf_token %}
@@ -39,15 +21,17 @@
             </div>
             <input type="hidden" name="next" value="{{ next }}"/>
         </div>
-        {% if messages %}
-            {% for message in messages %}
-                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                    <div class="alert alert-danger" role="alert">{{ message }}</div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
         <div class="weui-btn-area">
             <button class="weui-btn weui-btn_primary">登陆</button>
         </div>
     </form>
+{% endblock %}
+
+{% block extrascript %}
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
+    <script type="text/javascript">
+        {% if errMsg %}
+            weui.topTips("{{ errMsg }}");
+        {% endif %}
+    </script>
 {% endblock %}

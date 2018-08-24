@@ -90,6 +90,7 @@ def student_required(func):
 
 def binding(request):
     """学生绑定登陆视图"""
+    data = dict()
     if request.method == 'POST':
         xh = request.POST.get('xh')
         password = request.POST.get('password')
@@ -101,10 +102,12 @@ def binding(request):
                 student.openid = openid
                 student.save()
                 return redirect(next_url)
-        messages.add_message(request, messages.ERROR, "学号或密码错误！")
+            else:
+                data.setdefault('errMsg', '学号或密码错误')
+        else:
+            data.setdefault('errMsg', '学号或密码错误')
     else:
         next_url = request.GET.get('next')
-    data = dict()
     data.setdefault('url', reverse('binding'))
     data.setdefault('next', next_url)
     return render(request, 'wx/binding.html', data)
