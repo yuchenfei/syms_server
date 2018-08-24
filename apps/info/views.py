@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 
 from api.views import CsrfExemptSessionAuthentication
@@ -63,6 +64,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+    @staticmethod
+    def handle_err_response(exc, context, response):
+        if isinstance(exc, ValidationError):
+            if exc.get_codes().get('non_field_errors')[0] == 'unique':
+                response.status_code = 200
+                response.data['errMsg'] = '创建的课程已存在'
+        return response
 
 
 class StudentViewSet(viewsets.ModelViewSet):
