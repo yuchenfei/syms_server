@@ -1,11 +1,15 @@
 import random
 from datetime import datetime
 
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
 
 from api.views import CsrfExemptSessionAuthentication
 from experiment.models import Experiment
-from .models import ExamSetting, Question
+from .models import ExamSetting, Question, ExamRecord
 from .serializers import ExamSettingSerializer, QuestionSerializer
 
 
@@ -49,3 +53,20 @@ class QuestionViewSet(viewsets.ModelViewSet):
         if item:
             queryset = queryset.filter(item=item)
         return queryset
+
+
+class Report(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+
+    def get(self, request, exam_id):
+        exam = ExamSetting.objects.get(id=exam_id)
+        record_list = ExamRecord.objects.filter(setting=exam)
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet()
+        ws.append(['学号', '姓名', '得分', '提交时间'])
+        for record in record_list:
+            ws.append([record.student.xh, record.student.name, record.result, record.time.strftime('%M:%S')])
+        response = HttpResponse(content=save_virtual_workbook(wb),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+        return response

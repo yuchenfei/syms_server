@@ -20,7 +20,8 @@ def custom_exception_handler(exc, context):
                 response.data['status'] = 'error'
                 response.data['currentAuthority'] = 'guest'
                 del response.data['detail']
-        if context['view'].__class__.handle_err_response:
+
+        if hasattr(context['view'].__class__, 'handle_err_response'):
             response = context['view'].__class__.handle_err_response(exc, context, response)
     return response
 
