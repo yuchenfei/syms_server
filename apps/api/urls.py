@@ -5,6 +5,7 @@ from api import views
 from info import views as info_views
 from exam import views as exam_views
 from thinking import views as thinking_views
+from file import views as file_views
 from experiment import views as experiment_views
 
 router = DefaultRouter()
@@ -15,6 +16,7 @@ router.register('student', info_views.StudentViewSet)
 router.register('exam', exam_views.ExamSettingViewSet)
 router.register('question', exam_views.QuestionViewSet)
 router.register('thinking', thinking_views.ThinkingViewSet)
+router.register('file', file_views.FileViewSet)
 router.register('item', experiment_views.ItemViewSet)
 router.register('experiment', experiment_views.ExperimentViewSet)
 router.register('feedback', experiment_views.FeedbackViewSet)

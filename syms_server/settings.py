@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'experiment.apps.ExperimentConfig',
     'exam.apps.ExamConfig',
     'thinking.apps.ThinkingConfig',
+    'file.apps.FileConfig',
     'api.apps.ApiConfig',
     'wx.apps.WxConfig',
 ]
