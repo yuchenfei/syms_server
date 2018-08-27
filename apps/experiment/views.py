@@ -1,5 +1,6 @@
-from django.http import JsonResponse
-from openpyxl import load_workbook
+from django.http import JsonResponse, HttpResponse
+from openpyxl import load_workbook, Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import viewsets, permissions
 from rest_framework.views import APIView
 
@@ -100,3 +101,20 @@ class GradeImportView(APIView):
                 grades.append(grade)
             Grade.objects.bulk_create(grades)
         return JsonResponse(json)
+
+
+class GradeImportTemplateView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+
+    def get(self, request):
+        classes = request.GET.get('classes')
+        students = Student.objects.filter(classes=classes).all()
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet()
+        ws.append(['学号', '姓名', '成绩', '评语'])
+        for student in students:
+            ws.append([student.xh, student.name])
+        response = HttpResponse(content=save_virtual_workbook(wb),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=template.xlsx'
+        return response
