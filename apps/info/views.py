@@ -1,6 +1,9 @@
+from django.http import JsonResponse
+from openpyxl import load_workbook
 from rest_framework import viewsets, permissions, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.views import APIView
 
 from api.views import CsrfExemptSessionAuthentication
 from .models import User, Classes, Course, Student
@@ -89,3 +92,41 @@ class StudentViewSet(viewsets.ModelViewSet):
         if name:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+
+class StudentImportView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        data = request.data.get('data')  # 确认后的数据
+        file = request.data.get('file')  # 上传的文件
+        classes = request.data.get('classes')
+        classes = Classes.objects.get(id=classes)
+        student_list = Student.objects.filter(classes=classes).all()
+        xh_list = [student.xh for student in student_list]
+        json = {'status': 'ok', 'data': [], 'warning': []}
+        if file:
+            workbook = load_workbook(file)
+            worksheet = workbook[workbook.sheetnames[0]]
+            for row in worksheet.rows:
+                line = [col.value for col in row]
+                if len(line) != 2:
+                    json['status'] = 'error'
+                    break
+                if line[0] == '学号':
+                    continue
+                xh, name = line
+                if str(xh) in xh_list:
+                    json['warning'].append('{}({})'.format(name, xh))
+                else:
+                    json['data'].append({'xh': str(xh), 'name': name})
+        if data:
+            students = []
+            for d in data:
+                student = Student(xh=d['xh'], name=d['name'], classes=classes)
+                students.append(student)
+            Student.objects.bulk_create(students)
+        print(json)
+        return JsonResponse(json)
