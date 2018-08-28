@@ -86,10 +86,11 @@ class GradeImportView(APIView):
                 if line[0] == '学号':
                     continue
                 xh, name, grade, comment = line
-                if str(xh) in xhList:
-                    json['warning'].append(name)
-                else:
-                    json['data'].append({'xh': str(xh), 'name': name, 'grade': grade, 'comment': comment})
+                if grade:
+                    if str(xh) in xhList:
+                        json['warning'].append(name)
+                    else:
+                        json['data'].append({'xh': str(xh), 'name': name, 'grade': grade, 'comment': comment})
         if data:
             grades = []
             for d in data:
