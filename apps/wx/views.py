@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 
 from exam.models import ExamSetting, Question, ExamRecord
 from experiment.models import Experiment, Feedback, Grade
+from file.models import File
 from info.models import Student, Course
 from syms_server import settings
 from thinking.models import Thinking
@@ -311,3 +312,8 @@ def exam(request, student=None, exam_id=None):
     data.setdefault('data', json.dumps(question_list))
     data.setdefault('time_remain', time_remain)
     return render(request, 'wx/exam.html', data)
+
+
+def file(request):
+    file_list = File.objects.all()
+    return render(request, 'wx/file.html', {'file_list': file_list})

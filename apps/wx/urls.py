@@ -21,4 +21,5 @@ urlpatterns = [
     path('setting', views.setting, name='setting'),
     path('exam_select', views.exam_select, name='exam_select'),
     path('exam/<int:exam_id>/', views.exam, name='exam'),
+    path('file',views.file,name='file'),
 ]

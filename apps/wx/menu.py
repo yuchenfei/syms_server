@@ -8,6 +8,11 @@ def create_menu():
         "button":
         [
             {
+                "type": "view",
+                "name": "文件",
+                "url": "http://syms-server.flyingspace.cn/wx/file"
+            },
+            {
                 "name": "实验",
                 "sub_button":
                 [
