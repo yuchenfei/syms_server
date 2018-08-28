@@ -223,7 +223,25 @@
                 render_question();
             }
         });
-        $submitBtn.on("click", upload);
+        $submitBtn.on("click", () => {
+            if ($submitBtn.hasClass("weui-btn_disabled"))
+                return;
+            weui.confirm('是否确认提交', {
+                title: '提交答案',
+                buttons: [{
+                    label: '取消',
+                    type: 'default',
+                    onClick: function () {
+                    }
+                }, {
+                    label: '提交',
+                    type: 'primary',
+                    onClick: function () {
+                        upload()
+                    }
+                }]
+            });
+        });
 
         function upload() {
             let options = [];
