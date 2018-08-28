@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import viewsets, permissions
@@ -38,7 +38,9 @@ class ExamSettingViewSet(viewsets.ModelViewSet):
             else:
                 question_list = question_list.all()
             request.data['questions'] = ','.join([str(exam.id) for exam in question_list])
-        return super().create(request, *args, **kwargs)
+            return super().create(request, *args, **kwargs)
+        else:
+            return JsonResponse({'status': 'error', 'errMsg': '所选实验题库为空！'})
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
