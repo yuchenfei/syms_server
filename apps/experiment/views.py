@@ -90,6 +90,8 @@ class GradeImportView(APIView):
                     if str(xh) in xhList:
                         json['warning'].append(name)
                     else:
+                        if not comment:
+                            comment = ''
                         json['data'].append({'xh': str(xh), 'name': name, 'grade': grade, 'comment': comment})
         if data:
             grades = []
