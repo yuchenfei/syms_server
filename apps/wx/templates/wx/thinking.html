@@ -24,11 +24,11 @@
     {% endif %}
 {% endblock %}
 
-{% if not course_list %}
-    {% block extrascript %}
+{% block extrascript %}
+    {% if not course_list %}
         <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
         <script type="text/javascript">
             weui.alert('提交实验反馈后可查看', {title: '暂无思考题'});
         </script>
-    {% endblock %}
-{% endif %}
+    {% endif %}
+{% endblock %}
