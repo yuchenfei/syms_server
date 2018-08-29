@@ -73,6 +73,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         if isinstance(exc, ValidationError):
             if exc.get_codes().get('non_field_errors')[0] == 'unique':
                 response.status_code = 200
+                response.data['status'] = 'error'
                 response.data['errMsg'] = '创建的课程已存在'
         return response
 
