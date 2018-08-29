@@ -17,7 +17,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['name'] = instance.item.name
-        representation['info'] = '{}({})'.format(instance.course.name, instance.course.classes.name)
+        representation['info'] = '{}【{}】'.format(instance.course.name, instance.course.classes.name)
         return representation
 
 

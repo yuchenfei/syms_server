@@ -25,6 +25,11 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['info'] = '{}【{}】'.format(instance.name, instance.classes.name)
+        return representation
+
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
