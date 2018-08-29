@@ -17,7 +17,7 @@ def custom_exception_handler(exc, context):
             # 登陆失败
             if isinstance(exc, exceptions.AuthenticationFailed):
                 response.status_code = 200
-                response.data['status'] = 'error'
+                response.data['status'] = 'loginError'
                 response.data['currentAuthority'] = 'guest'
                 del response.data['detail']
 
