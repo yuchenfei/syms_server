@@ -3,17 +3,21 @@
 {% block title %}实验反馈{% endblock %}
 
 {% block container %}
-    {% for course, experiment_list in experiment_data.items %}
-        <div class="weui-cells__title">{{ course.name }}</div>
-        <div class="weui-cells">
-            {% for experiment in experiment_list %}
-                <a class="weui-cell weui-cell_access" href="{% url 'feedback-item' experiment.id %}">
-                    <div class="weui-cell__bd">
-                        <p>{{ experiment.item.name }}</p>
-                    </div>
-                    <div class="weui-cell__ft">{% if experiment.id in feedback_list %}已提交反馈{% endif %}</div>
-                </a>
-            {% endfor %}
-        </div>
-    {% endfor %}
+    {% if experiment_data %}
+        {% for course, experiment_list in experiment_data.items %}
+            <div class="weui-cells__title">{{ course.name }}</div>
+            <div class="weui-cells">
+                {% for experiment in experiment_list %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'feedback-item' experiment.id %}">
+                        <div class="weui-cell__bd">
+                            <p>{{ experiment.item.name }}</p>
+                        </div>
+                        <div class="weui-cell__ft">{% if experiment.id in feedback_list %}已提交反馈{% endif %}</div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="weui-cells__title">暂无实验</div>
+    {% endif %}
 {% endblock %}

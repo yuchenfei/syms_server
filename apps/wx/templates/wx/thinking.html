@@ -3,19 +3,32 @@
 {% block title %}思考题{% endblock %}
 
 {% block container %}
-    {% for course in course_list %}
-        <div class="weui-cells__title">{{ course.name }}</div>
-        <div class="weui-cells">
-            {% for experiment in experiment_list %}
-                {% if experiment.course == course %}
-                    <a class="weui-cell weui-cell_access" href="{% url 'thinking-item' experiment.id %}">
-                        <div class="weui-cell__bd">
-                            <p>{{ experiment.item.name }}</p>
-                        </div>
-                        <div class="weui-cell__ft"></div>
-                    </a>
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endfor %}
+    {% if course_list %}
+        {% for course in course_list %}
+            <div class="weui-cells__title">{{ course.name }}</div>
+            <div class="weui-cells">
+                {% for experiment in experiment_list %}
+                    {% if experiment.course == course %}
+                        <a class="weui-cell weui-cell_access" href="{% url 'thinking-item' experiment.id %}">
+                            <div class="weui-cell__bd">
+                                <p>{{ experiment.item.name }}</p>
+                            </div>
+                            <div class="weui-cell__ft"></div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="weui-cells__title">暂无思考题</div>
+    {% endif %}
 {% endblock %}
+
+{% if not course_list %}
+    {% block extrascript %}
+        <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
+        <script type="text/javascript">
+            weui.alert('提交实验反馈后可查看', {title: '暂无思考题'});
+        </script>
+    {% endblock %}
+{% endif %}
