@@ -43,8 +43,12 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Feedback.objects.all()
         item = self.request.query_params.get('item', None)
+        classes = self.request.query_params.get('classes', None)
         if item:
             queryset = queryset.filter(experiment__item=item)
+        if classes:
+            queryset = queryset.filter(experiment__course__classes=classes)
+        queryset = queryset.order_by('-datetime')
         return queryset
 
 
