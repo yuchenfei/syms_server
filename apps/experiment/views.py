@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.http import JsonResponse, HttpResponse
 from openpyxl import load_workbook, Workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -125,3 +126,17 @@ class GradeImportTemplateView(APIView):
                                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=template.xlsx'
         return response
+
+
+class CourseGradeView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+
+    def get(self, request):
+        course = request.GET.get('course')
+        queryset = Grade.objects.filter(experiment__course=course)
+        result_list = queryset.values('student__xh', 'student__name').annotate(Avg('grade'))
+        data = list()
+        for result in result_list:
+            data.append(dict(xh=result['student__xh'], name=result['student__name'], grade=result['grade__avg']))
+        print(data)
+        return JsonResponse(data, safe=False)
