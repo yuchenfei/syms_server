@@ -227,6 +227,8 @@ def grade(request, student=None):
     data = dict()
     data.setdefault('course_list', course_list)
     data.setdefault('grade_list', grade_list)
+    data.setdefault('item_name', json.dumps([grade.experiment.item.name for grade in grade_list]))
+    data.setdefault('data', json.dumps([grade.grade for grade in grade_list]))
     return render(request, 'wx/grade.html', data)
 
 
@@ -240,7 +242,7 @@ def grade_item(request, student=None, grade_id=None):
     data.append(queryset.filter(grade__range=(70, 79)).count())
     data.append(queryset.filter(grade__range=(80, 89)).count())
     data.append(queryset.filter(grade__range=(90, 100)).count())
-    return render(request, 'wx/grade_item.html', {'grade': _grade,'data':json.dumps(data)})
+    return render(request, 'wx/grade_item.html', {'grade': _grade, 'data': json.dumps(data)})
 
 
 @student_required

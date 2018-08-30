@@ -19,13 +19,58 @@
                 {% endfor %}
             </div>
         {% endfor %}
+        <div class="weui-cells__title">成绩情况总览</div>
+        <div id="main" style="width: 100%;height:300px;"></div>
     {% else %}
         <div class="weui-cells__title">暂无成绩</div>
     {% endif %}
 {% endblock %}
 
 {% block extrascript %}
-    {% if not course_list %}
+    {% if course_list %}
+        <script src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+        <script type="text/javascript">
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定图表的配置项和数据
+            var option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    data: JSON.parse('{{ item_name | safe }}'),
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 45,
+                        margin: 2,
+                    },
+                },
+                yAxis: {},
+                grid: {
+                    top: '5%',
+                    bottom: '40%'
+                },
+                series: [{
+                    name: '分数',
+                    type: 'bar',
+                    data: JSON.parse('{{ data | safe }}'),
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top',
+                        }
+                    },
+                }]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        </script>
+    {% else %}
         <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
         <script type="text/javascript">
             weui.alert('教师发布成绩后可查看', {title: '暂无成绩'});

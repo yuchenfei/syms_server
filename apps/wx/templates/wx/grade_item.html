@@ -46,10 +46,19 @@
                 data: ["<60", "60-69", "70-79", "80-89", "90-100"]
             },
             yAxis: {},
+            grid: {
+                top: '15%',
+            },
             series: [{
                 name: '人数',
                 type: 'bar',
-                data: JSON.parse('{{ data | safe }}')
+                data: JSON.parse('{{ data | safe }}'),
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'top',
+                    }
+                },
             }]
         };
 
