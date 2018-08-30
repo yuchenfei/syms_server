@@ -2,13 +2,13 @@ import random
 from datetime import datetime
 
 from django.http import HttpResponse, JsonResponse
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import viewsets, permissions
 from rest_framework.views import APIView
 
 from api.views import CsrfExemptSessionAuthentication
-from experiment.models import Experiment
+from experiment.models import Experiment, Item
 from .models import ExamSetting, Question, ExamRecord
 from .serializers import ExamSettingSerializer, QuestionSerializer
 
@@ -55,6 +55,42 @@ class QuestionViewSet(viewsets.ModelViewSet):
         if item:
             queryset = queryset.filter(item=item)
         return queryset
+
+
+class QuestionImportView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        data = request.data.get('data')  # 确认后的数据
+        file = request.data.get('file')  # 上传的文件
+        item = request.data.get('item')
+        item = Item.objects.get(id=item)
+        json = {'status': 'ok', 'data': []}
+        if file:
+            workbook = load_workbook(file)
+            worksheet = workbook[workbook.sheetnames[0]]
+            for row in worksheet.rows:
+                line = [col.value for col in row]
+                if line[0] == '题目':
+                    continue
+                title, a, b, c, d, answer = line
+                json['data'].append({
+                    'title': str(title),
+                    'a': str(a),
+                    'b': str(b),
+                    'c': str(c),
+                    'd': str(d),
+                    'answer': str(answer),
+                })
+        if data:
+            questions = list()
+            for d in data:
+                question = Question(title=d['title'], a=d['a'], b=d['b'], c=d['c'], d=d['d'], answer=d['answer'],
+                                    item=item)
+                questions.append(question)
+            Question.objects.bulk_create(questions)
+        return JsonResponse(json)
 
 
 class Report(APIView):

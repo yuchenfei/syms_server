@@ -31,6 +31,7 @@ urlpatterns = [
     path('grade/import_template', experiment_views.GradeImportTemplateView.as_view()),
     path('courseGrade', experiment_views.CourseGradeView.as_view()),
     path('student/import', info_views.StudentImportView.as_view()),
+    path('question/import', exam_views.QuestionImportView.as_view()),
     path('exam/report/<int:exam_id>/', exam_views.Report.as_view(), name='exam-report'),
     path('', include(router.urls)),
 ]
