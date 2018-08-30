@@ -233,7 +233,14 @@ def grade(request, student=None):
 @student_required
 def grade_item(request, student=None, grade_id=None):
     _grade = Grade.objects.get(id=grade_id)
-    return render(request, 'wx/grade_item.html', {'grade': _grade})
+    data = []
+    queryset = Grade.objects.filter(experiment=_grade.experiment)
+    data.append(queryset.filter(grade__lt=60).count())
+    data.append(queryset.filter(grade__range=(60, 69)).count())
+    data.append(queryset.filter(grade__range=(70, 79)).count())
+    data.append(queryset.filter(grade__range=(80, 89)).count())
+    data.append(queryset.filter(grade__range=(90, 100)).count())
+    return render(request, 'wx/grade_item.html', {'grade': _grade,'data':json.dumps(data)})
 
 
 @student_required
