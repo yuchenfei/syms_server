@@ -6,14 +6,16 @@ from fabric.api import env, run, local
 env.use_ssh_config = True
 
 REPO_URL = 'https://github.com/yuchenfei/syms_server.git'
+REACT_REPO_URL = 'https://github.com/yuchenfei/syms_frontend.git'
 
 
 def deploy():
     """部署应用至服务器"""
     site_folder = '/root/sites/syms'
     source_folder = site_folder + '/source'
+    react_folder = site_folder + '/react'
     _create_directory_structure_if_necessary(site_folder)
-    _get_latest_source(source_folder)
+    _get_latest_source(source_folder, react_folder)
     _update_settings(source_folder, env.host)
     _update_virtualenv(source_folder)
     _update_static_files(source_folder)
@@ -22,18 +24,24 @@ def deploy():
 
 def _create_directory_structure_if_necessary(site_folder):
     """创建目录结构"""
-    for subfolder in ('database', 'static', 'media', 'virtualenv', 'source'):
+    for subfolder in ('database', 'static', 'media', 'virtualenv', 'source', 'react'):
         run('mkdir -p %s/%s' % (site_folder, subfolder))
 
 
-def _get_latest_source(source_folder):
+def _get_latest_source(source_folder, react_folder):
     """获取最新代码"""
+    # 后台代码
     if exists(source_folder + '/.git'):
         run('cd %s && git fetch' % (source_folder,))
     else:
         run('git clone %s %s' % (REPO_URL, source_folder))
     current_commit = local("git log -n 1 --format=%H", capture=True)
     run('cd %s && git reset --hard %s' % (source_folder, current_commit))
+    # 前台代码
+    if exists(react_folder + '/.git'):
+        run('cd %s && git pull' % (react_folder,))
+    else:
+        run('git clone %s %s' % (REACT_REPO_URL, react_folder))
 
 
 def _update_settings(source_folder, site_name):
