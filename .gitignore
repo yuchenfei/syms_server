@@ -9,3 +9,6 @@ db.sqlite3
 
 # 媒体存储文件夹
 media/
+
+# MySQL配置文件
+/syms_server/my.cnf
