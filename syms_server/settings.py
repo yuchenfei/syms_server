@@ -153,7 +153,3 @@ CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8000'
 )
 CORS_ALLOW_CREDENTIALS = True
-
-# WX interface setting
-APP_ID = os.environ.get('APP_ID')
-APP_SECRET = os.environ.get('APP_SECRET')

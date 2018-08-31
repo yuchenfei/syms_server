@@ -1,8 +1,9 @@
-from wx.utils import MyOfficialAccounts
+import os
+
+from wx.api.official_accounts import OfficialAccounts
 
 
 def create_menu():
-    # TODO：部署时修改域名
     menu = """
     {
         "button":
@@ -10,7 +11,7 @@ def create_menu():
             {
                 "type": "view",
                 "name": "文件",
-                "url": "http://syms-server.flyingspace.cn/wx/file"
+                "url": "http://syms.flyingspace.cn/wx/file"
             },
             {
                 "name": "实验",
@@ -19,17 +20,17 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "在线答题",
-                        "url": "http://syms-server.flyingspace.cn/wx/exam_select"
+                        "url": "http://syms.flyingspace.cn/wx/exam_select"
                     },
                     {
                         "type": "view",
                         "name": "反馈",
-                        "url": "http://syms-server.flyingspace.cn/wx/feedback"
+                        "url": "http://syms.flyingspace.cn/wx/feedback"
                     },
                     {
                         "type": "view",
                         "name": "思考题",
-                        "url": "http://syms-server.flyingspace.cn/wx/thinking"
+                        "url": "http://syms.flyingspace.cn/wx/thinking"
                     }
                 ]
             },
@@ -40,18 +41,22 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "成绩",
-                        "url": "http://syms-server.flyingspace.cn/wx/grade"
+                        "url": "http://syms.flyingspace.cn/wx/grade"
                     },
                     {
                         "type": "view",
                         "name": "个人设置",
-                        "url": "http://syms-server.flyingspace.cn/wx/setting"
+                        "url": "http://syms.flyingspace.cn/wx/setting"
                     }
                 ]
             }
         ]
     }
     """
-    official_account = MyOfficialAccounts()
+    official_account = OfficialAccounts(app_id=os.environ.get('APP_ID'), app_secret=os.environ.get('APP_SECRET'))
     print('创建微信自定义菜单:')
     print(official_account.create_menu(menu))
+
+
+if __name__ == '__main__':
+    create_menu()
