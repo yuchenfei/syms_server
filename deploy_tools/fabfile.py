@@ -10,7 +10,7 @@ REPO_URL = 'https://github.com/yuchenfei/syms_server.git'
 
 def deploy():
     """部署应用至服务器"""
-    site_folder = '/root/sites/%s' % (env.host,)
+    site_folder = '/root/sites/syms'
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
     _get_latest_source(source_folder)
