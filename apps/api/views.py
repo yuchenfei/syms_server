@@ -83,9 +83,7 @@ class CurrentUserView(APIView):
                 },
                 'currentAuthority': 'admin' if user.is_admin else 'user'
             })
-        response = Response()
-        response.status_code = status.HTTP_401_UNAUTHORIZED
-        return response
+        return JsonResponse({})
 
 
 class SettingView(APIView):

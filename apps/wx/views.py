@@ -1,6 +1,7 @@
 import functools
 import hashlib
 import json
+import os
 import random
 from datetime import datetime, timedelta
 
@@ -21,7 +22,7 @@ from thinking.models import Thinking
 from .api.login import Login
 from .utils import reverse_absolute_url, redirect_with_next_url
 
-wx_login = Login(app_id=settings.APP_ID, app_secret=settings.APP_SECRET)
+wx_login = Login(app_id=os.environ.get('APP_ID'), app_secret=os.environ.get('APP_SECRET'))
 
 
 class WXAuthView(APIView):
