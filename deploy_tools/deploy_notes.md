@@ -18,7 +18,20 @@
 	sudo apt install nginx git python3 python3-pip libmysqlclient-dev nodejs
 	sudo pip3 install virtualenv
 
-## Supervisor任务
+## 执行部署
+
+* 确保本地python环境中已经安装fabric3
+* 在deploy_tools目录下执行`fab deploy:host=syms`，注：syms 为ssh config里服务器的别名
+
+## 前端部署
+
+fab脚本只获取最新的前端源码，部署需要执行以下命令
+
+* `npm install`安装所需node.js的包,首次部署执行即可
+* `npm run build`打包项目
+* 将react/dist/static中的文件复制到项目static目录下
+
+## 配置Supervisor任务
 
 * 参考config_template/gunicorn-supervisor.conf
 * 把USERNAME替换为服务器的用户名，例如my_name
