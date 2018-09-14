@@ -11,7 +11,7 @@ def create_menu():
             {
                 "type": "view",
                 "name": "文件",
-                "url": "http://syms.flyingspace.cn/wx/file"
+                "url": "http://www.ustslab.com/wx/file"
             },
             {
                 "name": "实验",
@@ -20,17 +20,17 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "在线答题",
-                        "url": "http://syms.flyingspace.cn/wx/exam_select"
+                        "url": "http://www.ustslab.com/wx/exam_select"
                     },
                     {
                         "type": "view",
                         "name": "反馈",
-                        "url": "http://syms.flyingspace.cn/wx/feedback"
+                        "url": "http://www.ustslab.com/wx/feedback"
                     },
                     {
                         "type": "view",
                         "name": "思考题",
-                        "url": "http://syms.flyingspace.cn/wx/thinking"
+                        "url": "http://www.ustslab.com/wx/thinking"
                     }
                 ]
             },
@@ -41,12 +41,12 @@ def create_menu():
                     {
                         "type": "view",
                         "name": "成绩",
-                        "url": "http://syms.flyingspace.cn/wx/grade"
+                        "url": "http://www.ustslab.com/wx/grade"
                     },
                     {
                         "type": "view",
                         "name": "个人设置",
-                        "url": "http://syms.flyingspace.cn/wx/setting"
+                        "url": "http://www.ustslab.com/wx/setting"
                     }
                 ]
             }
