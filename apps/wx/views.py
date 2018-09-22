@@ -275,6 +275,8 @@ def exam_select(request, student=None):
 @student_required
 def exam(request, student=None, exam_id=None):
     _exam = ExamSetting.objects.get(id=exam_id)
+    if ExamRecord.objects.filter(setting=_exam, student=student).exists():
+        return render(request, 'wx/error.html', {'errMsg': '已完成答题'})
     if request.method == 'POST':
         options = json.loads(request.POST.get('options'))
         answer_key = 'exam_{}'.format(exam_id)
@@ -294,8 +296,6 @@ def exam(request, student=None, exam_id=None):
         record.save()
         return JsonResponse({'status': 'ok', 'result': result, 'count': count})
     # GET
-    if ExamRecord.objects.filter(setting=_exam, student=student).exists():
-        return render(request, 'wx/error.html', {'errMsg': '已完成答题'})
     questions_key = 'questions_{}'.format(exam_id)
     questions = cache.get(questions_key)
     if not questions:
