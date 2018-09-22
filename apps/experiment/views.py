@@ -138,5 +138,4 @@ class CourseGradeView(APIView):
         data = list()
         for result in result_list:
             data.append(dict(xh=result['student__xh'], name=result['student__name'], grade=result['grade__avg']))
-        print(data)
         return JsonResponse(data, safe=False)

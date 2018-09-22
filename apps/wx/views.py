@@ -315,7 +315,6 @@ def exam(request, student=None, exam_id=None):
         time_remain = -1
     elif time_remain < 60:
         time_remain = 60
-    print(time_remain)
     data = dict()
     data.setdefault('exam', _exam)
     data.setdefault('data', json.dumps(question_list))

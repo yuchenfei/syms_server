@@ -103,7 +103,7 @@ class Report(APIView):
         ws = wb.create_sheet()
         ws.append(['学号', '姓名', '得分', '提交时间'])
         for record in record_list:
-            ws.append([record.student.xh, record.student.name, record.result, record.time.strftime('%M:%S')])
+            ws.append([record.student.xh, record.student.name, record.result, record.time.strftime('%H:%M:%S')])
         response = HttpResponse(content=save_virtual_workbook(wb),
                                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=report.xlsx'

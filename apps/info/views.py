@@ -129,5 +129,4 @@ class StudentImportView(APIView):
                 student = Student(xh=d['xh'], name=d['name'], classes=classes)
                 students.append(student)
             Student.objects.bulk_create(students)
-        print(json)
         return JsonResponse(json)
