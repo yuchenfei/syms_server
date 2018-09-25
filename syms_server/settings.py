@@ -154,9 +154,3 @@ CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8000'
 )
 CORS_ALLOW_CREDENTIALS = True
-
-THUMBNAIL_ALIASES = {
-    '': {
-        'avatar': {'size': (300, 300), 'crop': False},
-    },
-}

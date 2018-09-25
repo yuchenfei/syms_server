@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from .models import Experiment, Item, Feedback, Grade
 
+option_src = {'size': (800, 800), 'crop': False}
+option_thumbnail = {'size': (300, 300), 'crop': False}
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,10 +38,12 @@ class FeedbackSerializer(serializers.ModelSerializer):
             image = getattr(obj, 'image{}'.format(i))
             if image:
                 url = request.build_absolute_uri(image.url)
-                thumbnail = request.build_absolute_uri(get_thumbnailer(image)['avatar'].url)
+                src_url = request.build_absolute_uri(get_thumbnailer(image).get_thumbnail(option_src).url)
+                thumbnail_url = request.build_absolute_uri(get_thumbnailer(image).get_thumbnail(option_thumbnail).url)
                 images.append({
-                    'src': url,
-                    'thumbnail': thumbnail,
+                    'src': src_url,
+                    'caption': '原始图片链接： {}'.format(url),
+                    'thumbnail': thumbnail_url,
                     'orientation': 'landscape',
                 })
         return images
