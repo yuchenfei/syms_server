@@ -1,3 +1,4 @@
+from easy_thumbnails.files import get_thumbnailer
 from rest_framework import serializers
 
 from .models import Experiment, Item, Feedback, Grade
@@ -35,8 +36,10 @@ class FeedbackSerializer(serializers.ModelSerializer):
             image = getattr(obj, 'image{}'.format(i))
             if image:
                 url = request.build_absolute_uri(image.url)
+                thumbnail = request.build_absolute_uri(get_thumbnailer(image)['avatar'].url)
                 images.append({
                     'src': url,
+                    'thumbnail': thumbnail,
                     'orientation': 'landscape',
                 })
         return images
