@@ -317,7 +317,9 @@ def exam(request, student=None, exam_id=None):
         time_remain = 60
     data = dict()
     data.setdefault('exam', _exam)
-    data.setdefault('data', json.dumps(question_list))
+    json_str = json.dumps(question_list)
+    json_str = json_str.replace("\'","\\\'")
+    data.setdefault('data', json_str)
     data.setdefault('time_remain', time_remain)
     return render(request, 'wx/exam.html', data)
 
