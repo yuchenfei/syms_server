@@ -75,6 +75,8 @@ class QuestionImportView(APIView):
                 if line[0] == '题目':
                     continue
                 title, a, b, c, d, answer = line
+                if not title:
+                    continue
                 json['data'].append({
                     'title': str(title),
                     'a': str(a),
