@@ -70,6 +70,7 @@ class QuestionImportView(APIView):
         if file:
             workbook = load_workbook(file)
             worksheet = workbook[workbook.sheetnames[0]]
+            i = 0
             for row in worksheet.rows:
                 line = [col.value for col in row]
                 if line[0] == '题目':
@@ -78,6 +79,7 @@ class QuestionImportView(APIView):
                 if not title:
                     continue
                 json['data'].append({
+                    'i': i,
                     'title': str(title),
                     'a': str(a),
                     'b': str(b),
@@ -85,6 +87,7 @@ class QuestionImportView(APIView):
                     'd': str(d),
                     'answer': str(answer),
                 })
+                i += 1
         if data:
             questions = list()
             for d in data:
